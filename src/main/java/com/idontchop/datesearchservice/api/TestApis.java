@@ -42,14 +42,22 @@ public class TestApis {
 		List<Mono<String>> monoList =
 		getServices().getRegisteredApplications().stream().map( elem -> {
 			String serviceName = elem.getName();
-			String baseUrl = discoveryClient.getNextServerFromEureka(elem.getName(), false).getHomePageUrl();
+			String baseUrl = discoveryClient.getNextServerFromEureka(serviceName, false).getHomePageUrl();
 			WebClient webClient = WebClient.create(baseUrl);
 			Mono<String> newMono = webClient.get().uri( uriBuilder -> uriBuilder.path("/helloWorld").build() )
-					.retrieve().bodyToMono(String.class);
+					.exchange()
+					.flatMap ( response -> {
+						if ( response.statusCode().is2xxSuccessful() ) {
+							return response.bodyToMono(String.class);
+					} else {
+						return Mono.just("404" + serviceName);
+					}});
+					
+					
 			return newMono;
 		}).collect ( Collectors.toList());
 		
-		
+		return Flux.merge(monoList);
 	}
 	
 	public Mono<String> testLocationSearch () {

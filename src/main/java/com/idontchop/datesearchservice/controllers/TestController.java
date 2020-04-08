@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.idontchop.datesearchservice.api.TestApis;
 import com.netflix.appinfo.InstanceInfo;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -33,8 +34,18 @@ public class TestController {
 		return infoMap;
 	}
 	
+	/*
+	 * Change this to routes
+	 */
+	
+	
 	@GetMapping ("/testLocation")
 	public Mono<String> testLocation () {
 		return testApi.testLocationSearch();
+	}
+	
+	@GetMapping ("/helloWorlds")
+	public Flux<Object> getHelloWorlds() {
+		return testApi.helloWorlds();
 	}
 }
