@@ -4,9 +4,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.idontchop.datesearchservice.dtos.ReduceRequest;
 import com.netflix.appinfo.InstanceInfo;
 import com.netflix.discovery.EurekaClient;
 import com.netflix.discovery.shared.Applications;
@@ -26,11 +28,22 @@ public class TestApis {
 	@Autowired
 	private EurekaClient discoveryClient;
 	
+	@Autowired
+	private WebClient.Builder webClientBuilder;
 	
 	
+	/**
+	 * TODO: change to enums
+	 * @return
+	 */
 	public InstanceInfo getLocationInfo () {
 		InstanceInfo locationService = discoveryClient.getNextServerFromEureka("location-service", false);
 		return locationService;
+	}
+	
+	public InstanceInfo getGenderInfo () {
+		InstanceInfo genderService = discoveryClient.getNextServerFromEureka("gender-service", false);
+		return genderService;
 	}
 	
 	public Applications getServices() {
@@ -42,17 +55,16 @@ public class TestApis {
 		List<Mono<String>> monoList =
 		getServices().getRegisteredApplications().stream().map( elem -> {
 			String serviceName = elem.getName();
-			String baseUrl = discoveryClient.getNextServerFromEureka(serviceName, false).getHomePageUrl();
-			WebClient webClient = WebClient.create(baseUrl);
+			String baseUrl = "http://" + discoveryClient.getNextServerFromEureka(serviceName, false).getAppName();
+			WebClient webClient = webClientBuilder.baseUrl(baseUrl).build();
 			Mono<String> newMono = webClient.get().uri( uriBuilder -> uriBuilder.path("/helloWorld").build() )
 					.exchange()
 					.flatMap ( response -> {
 						if ( response.statusCode().is2xxSuccessful() ) {
 							return response.bodyToMono(String.class);
 					} else {
-						return Mono.just("404" + serviceName);
+						return Mono.just("404 \"" + baseUrl + "helloWorld\"");
 					}});
-					
 					
 			return newMono;
 		}).collect ( Collectors.toList());
@@ -67,6 +79,28 @@ public class TestApis {
 		
 		return webClient.get().uri(uriBuilder -> uriBuilder.path(testurl).build(0) )
 			.retrieve().bodyToMono(String.class);
+	}
+	
+	public Mono<String> testDirectCall () {
+		
+		String testurl = "http://MEDIA-SERVICE/helloWorld";
+		
+		WebClient webClient = webClientBuilder.build();
+		
+		return webClient.get().uri(testurl).retrieve().bodyToMono(String.class);
+	}
+	
+	public Mono<List<String>> reduceGender (String username, List<String> userList) {
+		String reduceGenderApi = "/api/reduce";
+		
+		ReduceRequest reduceRequest = new ReduceRequest(username, userList);
+		
+		WebClient webClient = WebClient.create(getGenderInfo().getHomePageUrl());
+		
+		return webClient.post().uri( uriBuilder -> uriBuilder.path(reduceGenderApi).build(0) )
+				.bodyValue(reduceRequest)
+				.retrieve()
+				.bodyToMono(new ParameterizedTypeReference<List<String>>() {} );
 	}
 
 }
