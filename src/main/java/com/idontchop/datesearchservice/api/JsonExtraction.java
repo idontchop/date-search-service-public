@@ -3,7 +3,9 @@ package com.idontchop.datesearchservice.api;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +24,7 @@ public class JsonExtraction {
 	@Autowired
 	ObjectMapper mapper;
 	
-	public List<String> userListFromLocation (String locationJson) throws IOException {
+	public Set<String> userListFromLocation (String locationJson) throws IOException {
 		
 		JsonNode userList = mapper.readTree(locationJson).get("results").get("content");
 		
@@ -33,7 +35,7 @@ public class JsonExtraction {
 			throw new IOException("Malformed Json from Location Service: " + locationJson);
 		}
 		
-		List<String> users = new ArrayList<>();
+		Set<String> users = new HashSet<>();
 		
 		userList.forEach( user -> {
 			String username = user.get("content").get("username").textValue();

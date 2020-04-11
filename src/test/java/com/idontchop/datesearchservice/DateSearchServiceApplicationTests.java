@@ -24,6 +24,7 @@ import com.idontchop.datesearchservice.config.enums.MicroService;
 import com.idontchop.datesearchservice.dtos.ReduceRequest;
 import com.idontchop.datesearchservice.dtos.ReduceRequestWithAge;
 import com.idontchop.datesearchservice.dtos.RestMessage;
+import com.idontchop.datesearchservice.dtos.SearchDto;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -61,7 +62,9 @@ class DateSearchServiceApplicationTests {
 		List<String> aList = List.of("1","2","username","ohhellno");
 		List<String> bList = List.of("4","5","username");
 		
-		Mono<Set<String>> test = Mono.zip(result -> {
+		Mono<Set<String>> test = Mono.zip(
+			List.of(Mono.just(aList), Mono.just(bList)),
+			result -> {
 			Set<String> set = fromList;
 			for ( Object r : result ) {
 				if ( r instanceof List<?>) {
@@ -72,8 +75,8 @@ class DateSearchServiceApplicationTests {
 				}
 			}
 			return set;
-			},
-		Mono.just(aList), Mono.just(bList));
+			});
+		
 		
 		Set<String> holyshit = test.block();
 		assertEquals ( 1, holyshit.size());
@@ -87,7 +90,7 @@ class DateSearchServiceApplicationTests {
 	public void testAbstractApis () throws IOException {
 		
 		String username = "username";
-		List<String> potentials = 
+		Set<String> potentials = 
 				jsonExtraction.userListFromLocation(testApis.testLocationSearch().block());
 		
 		assertTrue ( potentials.size() > 0);
@@ -97,19 +100,21 @@ class DateSearchServiceApplicationTests {
 				context.getBean(MicroService.GENDER.getClassName()); 
 		MicroServiceApiAbstract ageApi = (MicroServiceApiAbstract)
 				context.getBean(MicroService.AGE.getClassName());
+		MicroServiceApiAbstract blockApi = (MicroServiceApiAbstract)
+				context.getBean(MicroService.BLOCK.getClassName());
 		
 		// gender
-		List<String> newPotentials = 
+		SearchDto newPotentials = 
 				genderApi.reduce(username, potentials).block();
 		
-		assertEquals(5, newPotentials.size());
+		assertEquals(5, newPotentials.getPotentials().size());
 		
-		newPotentials.forEach( e -> {
+		newPotentials.getPotentials().forEach( e -> {
 			logger.debug("newPotentials: " + e);
 		});
 		
 		// Age
-		ReduceRequestWithAge reduceRequestWithAge = new ReduceRequestWithAge(username, newPotentials);
+		ReduceRequestWithAge reduceRequestWithAge = new ReduceRequestWithAge(username, newPotentials.getPotentials());		
 		
 		reduceRequestWithAge.setMaxAge(80);
 		reduceRequestWithAge.setMinAge(5);
@@ -117,14 +122,80 @@ class DateSearchServiceApplicationTests {
 		newPotentials =
 				ageApi.reduce(reduceRequestWithAge).block();
 		
-		assertEquals(2, newPotentials.size());
+		assertEquals(2, newPotentials.getPotentials().size());
 		
+		newPotentials = blockApi.reduce(username, newPotentials.getPotentials()).block();
+		
+		assertEquals(1, newPotentials.getPotentials().size());
+		assertTrue(newPotentials.getPotentials().contains("30"));
+		
+		
+	}
+	
+	@Test
+	public void testZip () throws IOException {
+		
+		String username = "username";
+		Set<String> potentials = 
+				jsonExtraction.userListFromLocation(testApis.testLocationSearch().block());
+		
+		assertTrue ( potentials.size() > 0);
+		assertTrue ( potentials.contains("22"));
+		
+		MicroServiceApiAbstract genderApi = (MicroServiceApiAbstract)
+				context.getBean(MicroService.GENDER.getClassName()); 
+		MicroServiceApiAbstract ageApi = (MicroServiceApiAbstract)
+				context.getBean(MicroService.AGE.getClassName());
+		MicroServiceApiAbstract blockApi = (MicroServiceApiAbstract)
+				context.getBean(MicroService.BLOCK.getClassName());
+		
+		List<Mono<SearchDto>> newPotentials = new ArrayList<>();
+		// gender
+		newPotentials.add(
+				genderApi.reduce(username, potentials));		
+		// Age
+		ReduceRequestWithAge reduceRequestWithAge = new ReduceRequestWithAge(username, potentials);
+		reduceRequestWithAge.setAge(5,80);
+		newPotentials.add(
+				ageApi.reduce(reduceRequestWithAge));
+		// block
+		newPotentials.add(
+				blockApi.reduce(username,potentials));
+		
+		SearchDto result = Mono.zip(newPotentials, resultMonos -> {
+			if ( resultMonos.length == 1 ) return (SearchDto) resultMonos[0];
+			else {
+				for ( int i = 1; i < resultMonos.length; i++) {
+					((SearchDto) resultMonos[0]).intersect((SearchDto) resultMonos[i]);
+				}
+				return (SearchDto) resultMonos[0];
+			}
+		}).block();
+		
+		assertTrue( result.getPotentials().contains("30"));
+				
+		/*
+		 * 		Mono<Set<String>> test = Mono.zip(
+			List.of(Mono.just(aList), Mono.just(bList)),
+			result -> {
+			Set<String> set = fromList;
+			for ( Object r : result ) {
+				if ( r instanceof List<?>) {
+					
+					set = set.stream()
+							.filter(((List<String>) r)::contains)
+							.collect(Collectors.toSet());
+				}
+			}
+			return set;
+			});
+		 */
 	}
 	
 	@Test
 	public void testHelloWorlds() throws InterruptedException {
 		
-		Flux<RestMessage> apis = testApis.helloWorlds();
+		Flux<SearchDto> apis = testApis.helloWorlds();
 		
 		
 		apis.subscribe( e -> {

@@ -12,7 +12,7 @@ public class ReduceRequest {
 		
 	}
 	
-	public ReduceRequest ( String name, List<String> potentials) {
+	public ReduceRequest ( String name, Iterable<String> potentials) {
 		this.name = name;
 		this.potentials = potentials;
 	}
@@ -23,7 +23,7 @@ public class ReduceRequest {
 	// This list is some potential options the api has considered.
 	// Using the name, the service will check the potentials against the interestedins
 	@NotEmpty(message = "Need at least one potential")
-	List<String> potentials;
+	Iterable<String> potentials;
 
 	public String getName() {
 		return name;
@@ -33,11 +33,11 @@ public class ReduceRequest {
 		this.name = name;
 	}
 
-	public List<String> getPotentials() {
+	public Iterable<String> getPotentials() {
 		return potentials;
 	}
 
-	public void setPotentials(List<String> potentials) {
+	public void setPotentials(Iterable<String> potentials) {
 		this.potentials = potentials;
 	}
 	

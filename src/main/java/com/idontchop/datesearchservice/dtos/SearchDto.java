@@ -3,8 +3,11 @@ package com.idontchop.datesearchservice.dtos;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 
@@ -24,11 +27,11 @@ public class SearchDto {
 	
 	private LocalDateTime created = LocalDateTime.now();
 	
-	private List<String> potentials = new ArrayList<>();
+	private Set<String> potentials = new HashSet<>();
 	
 	private Map<String,ApiMessage> apiMessages = new HashMap<>();
 
-	public SearchDto ( List<String> potentials ) {
+	public SearchDto ( Set<String> potentials ) {
 		this.potentials = potentials;
 	}
 	
@@ -39,9 +42,30 @@ public class SearchDto {
 		return newDto;
 	}
 	
-	public static SearchDto build( List<String> potentials ) {
+	public static SearchDto empty () {
+		return build();
+	}
+	
+	public static SearchDto build( Set<String> potentials ) {
 		SearchDto newDto = build();
 		newDto.setPotentials(potentials);
+		return newDto;
+	}
+	
+	public static SearchDto empty ( String service, String level, String message ) {
+		SearchDto newDto = build();
+		ApiMessage apiM = new ApiMessage();
+		apiM.setLevel(level); apiM.setMessage(message);
+		newDto.add(service, apiM);
+		return newDto;
+	}
+	
+	public static SearchDto error ( String service, String error, String message ) {
+		SearchDto newDto = build();
+		ApiMessage apiM = new ApiMessage();
+		apiM.setLevel("ERROR"); apiM.setMessage(message);
+		apiM.setError(error);
+		newDto.add(service, apiM);
 		return newDto;
 	}
 	
@@ -58,11 +82,11 @@ public class SearchDto {
 		this.created = created;
 	}
 
-	public List<String> getPotentials() {
+	public Set<String> getPotentials() {
 		return potentials;
 	}
 
-	public void setPotentials(List<String> potentials) {
+	public void setPotentials(Set<String> potentials) {
 		this.potentials = potentials;
 	}
 
@@ -75,6 +99,55 @@ public class SearchDto {
 		this.apiMessages = apiMessages;
 	}
 	
+	public SearchDto fromRestMessage ( RestMessage restMessage ) {
+		restMessage.getMessages().forEach( (k,v) -> {
+			this.apiMessages.put(k,ApiMessage.from(v));
+		});
+		return this;
+	}
 	
+	public boolean isError () {
+		for ( ApiMessage message : apiMessages.values() ) {
+			if ( message.getLevel().equals("ERROR")) return true;
+		}
+		return false;		
+	}
+	
+	public boolean isEmpty () {
+		return potentials.size() == 0;
+	}
+	
+	/**
+	 * Combines the search dtos together using intersection.
+	 * 
+	 * Potentials must exist in both searchDtos.
+	 * 
+	 * ApiMessages are added together and saved. Created date is updated.
+	 * 
+	 * @param searchDto
+	 * @return
+	 */
+	public SearchDto intersect ( SearchDto searchDto ) {
+		
+		created = LocalDateTime.now();
+		
+		// find potentials intersection
+		potentials = potentials.stream()
+				.filter(((Set<String>) searchDto.getPotentials())::contains)
+				.collect(Collectors.toSet());
+		
+		// combine ApiMessages, duplicates should never happen
+		// and would likely indicate an error in itself
+		
+		searchDto.getApiMessages().forEach( (k,v) -> {
+			if ( this.apiMessages.containsKey(k)) {
+				this.apiMessages.put(k + created.toString(), v); // duplicate is not common
+			} else {
+				this.apiMessages.put(k,v);
+			}
+		});
+		
+		return this;
+	}
 
 }

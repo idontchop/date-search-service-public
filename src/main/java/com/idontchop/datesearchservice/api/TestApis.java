@@ -3,9 +3,13 @@ package com.idontchop.datesearchservice.api;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.idontchop.datesearchservice.config.enums.MicroService;
@@ -30,6 +34,8 @@ import reactor.core.publisher.Mono;
  */
 @Service
 public class TestApis {
+	
+	Logger logger = LoggerFactory.getLogger(TestApis.class);
 	
 	@Autowired
 	private EurekaClient discoveryClient;
@@ -68,32 +74,42 @@ public class TestApis {
 			WebClient webClient = webClientBuilder.baseUrl(baseUrl).build();
 			Mono<SearchDto> newMono = webClient.get().uri( uriBuilder -> uriBuilder.path("/helloWorld").build() )
 					.exchange()
-					.flatMap ( response -> {
-					
-						// return the body as a RestMessage
-						if ( response.statusCode().is2xxSuccessful() ) {
-							return response.bodyToMono(RestMessage.class).map( body -> {
-								SearchDto dto = new SearchDto();								
-								dto.add(serviceName, new ApiMessage("test","test"));
-								return dto;
-							});
-					} else {
-						SearchDto dto = new SearchDto();
-						dto.add("error", new ApiMessage("test","test"));
-						return Mono.just(dto);
-						// return the error code and message
-						//return Mono.just(RestMessage.build(serviceName)
-						//		.add(Integer.toString(response.rawStatusCode()),
-						//				response.statusCode().getReasonPhrase()));
-					}});
-					// https://github.com/codecentric/spring-boot-admin/blob/master/spring-boot-admin-server/src/main/java/de/codecentric/boot/admin/server/services/StatusUpdater.java#L64
-					// create a statusinfo class to hold response info
-					// Have searchdto store the statusinfos and lists 
-			
+					.flatMap ( response -> convertHelloWorldBody(response,serviceName) )
+					.doOnError( ex -> logger.debug(ex.getMessage()))
+					.onErrorResume( ex -> handleHelloWorldError(ex, serviceName));
 			return newMono;
 		}).collect ( Collectors.toList());
 		
 		return Flux.merge(monoList);
+	}
+	
+	private Mono<SearchDto> handleHelloWorldError(Throwable ex, String serviceName) {
+		
+		return Mono.just(SearchDto.empty(serviceName,ex.getClass().getName(), ex.getMessage()));
+	}
+
+	private Mono<SearchDto> convertHelloWorldBody (ClientResponse response, String serviceName) {
+		// https://github.com/codecentric/spring-boot-admin/blob/master/spring-boot-admin-server/src/main/java/de/codecentric/boot/admin/server/services/StatusUpdater.java#L64
+		// create a statusinfo class to hold response info
+		// Have searchdto store the statusinfos and lists 	
+		boolean hasContent = response.headers()	// TODO: get content for error as well, maybe reasonphrase enough
+					.contentType()
+					.map( (mt) -> mt.isCompatibleWith(MediaType.APPLICATION_JSON))
+					.orElse(false);
+			
+			// return the body as a RestMessage
+		if ( hasContent && response.statusCode().is2xxSuccessful() ) {
+				return response.bodyToMono(RestMessage.class).map( body -> {
+					return SearchDto.build().fromRestMessage(body);
+				});
+		} else {
+			return Mono.just(SearchDto.empty(serviceName,Integer.toString(response.statusCode().value()),
+					response.statusCode().getReasonPhrase() ) );
+			// return the error code and message
+			//return Mono.just(RestMessage.build(serviceName)
+			//		.add(Integer.toString(response.rawStatusCode()),
+			//				response.statusCode().getReasonPhrase()));
+		}
 	}
 	
 	public Mono<String> testLocationSearch () {

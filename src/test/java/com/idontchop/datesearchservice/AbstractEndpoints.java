@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -51,7 +52,7 @@ public class AbstractEndpoints {
 		logger.debug("Finished");
 		logger.debug(json);
 		
-		List<String> userList = jsonExtractor.userListFromLocation(json);
+		Set<String> userList = jsonExtractor.userListFromLocation(json);
 		
 		assertTrue (userList.size() > 0);
 		

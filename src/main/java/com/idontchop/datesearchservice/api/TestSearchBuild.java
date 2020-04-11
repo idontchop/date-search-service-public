@@ -2,6 +2,7 @@ package com.idontchop.datesearchservice.api;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,7 +30,7 @@ public class TestSearchBuild {
 	 * 
 	 * @return
 	 */
-	public List<String> testSearchLocation () throws IOException {
+	public Set<String> testSearchLocation () throws IOException {
 		
 		return jsonExtraction.userListFromLocation(
 				testApis.testLocationSearch().block());

@@ -1,13 +1,14 @@
 package com.idontchop.datesearchservice.dtos;
 
 import java.util.List;
+import java.util.Set;
 
 public class ReduceRequestWithAge extends ReduceRequest {
 	
 	private int minAge;
 	private int maxAge;
 	
-	public ReduceRequestWithAge ( String username, List<String> potentials) {
+	public ReduceRequestWithAge ( String username, Set<String> potentials) {
 		super (username, potentials);
 	}
 	
@@ -21,6 +22,10 @@ public class ReduceRequestWithAge extends ReduceRequest {
 		return maxAge;
 	}
 	public void setMaxAge(int maxAge) {
+		this.maxAge = maxAge;
+	}
+	public void setAge(int minAge, int maxAge) {
+		this.minAge = minAge;
 		this.maxAge = maxAge;
 	}
 	

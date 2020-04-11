@@ -2,14 +2,21 @@ package com.idontchop.datesearchservice.api;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.idontchop.datesearchservice.config.enums.MicroService;
 import com.idontchop.datesearchservice.dtos.ReduceRequest;
+import com.idontchop.datesearchservice.dtos.RestMessage;
+import com.idontchop.datesearchservice.dtos.SearchDto;
 import com.netflix.appinfo.InstanceInfo;
 import com.netflix.discovery.EurekaClient;
 
@@ -28,7 +35,9 @@ import reactor.core.publisher.Mono;
 @Component
 public abstract class MicroServiceApiAbstract {
 	
-	private MicroService microService;	// set in constructor of subclass
+	protected Logger logger = LoggerFactory.getLogger(MicroServiceApiAbstract.class);
+	
+	protected MicroService microService;	// set in constructor of subclass
 	
 	protected String apiReduceExt = 	"/api/reduce"; 	// can be overridden by subclass if necessary
 													// but should try to standardize this
@@ -64,7 +73,7 @@ public abstract class MicroServiceApiAbstract {
 	/**
 	 * @see MicroServiceApiAbstract#reduce(ReduceRequest)
 	 */
-	public Mono<List<String>> reduce (String username, List<String> potentials) {
+	public Mono<SearchDto> reduce (String username, Set<String> potentials) {
 		
 		// The DTO for communication with microservice
 		ReduceRequest reduceRequest = new ReduceRequest(username, potentials);
@@ -88,7 +97,7 @@ public abstract class MicroServiceApiAbstract {
 	 * @param potentials
 	 * @return
 	 */
-	public Mono<List<String>> reduce ( ReduceRequest reduceRequest ) {
+	public Mono<SearchDto> reduce ( ReduceRequest reduceRequest ) {
 		
 		// Use enum to find the proper microservice from Eureka
 		WebClient webClient = WebClient.create( getServiceInfo().getHomePageUrl() );
@@ -96,8 +105,55 @@ public abstract class MicroServiceApiAbstract {
 		// API call will return a Mono with a new List of potentials
 		return webClient.post().uri( uriBuilder -> uriBuilder.path(apiReduceExt).build(0) )
 				.bodyValue(reduceRequest)
-				.retrieve()
-				.bodyToMono(new ParameterizedTypeReference<List<String>>() {} );
+				.exchange()
+				.flatMap( response -> convertResponseBody(response) )
+				.doOnError( ex -> logger.debug(ex.getMessage()))
+				.onErrorResume( ex -> handleResponseError(ex) );
+	}
+	
+	/**
+	 * Handles converting the responsebody in a webclient request to the microservice.
+	 * 
+	 * Will return the potentials as well as any messages received (not implemented).
+	 * 
+	 * In case of an error, potentials will be returned empty and an apimessage will be
+	 * set.
+	 * 
+	 * @param response
+	 * @return
+	 */
+	public Mono<SearchDto> convertResponseBody ( ClientResponse response ) {
+		
+		boolean hasContent = response.headers()	// TODO: get content for error as well, maybe reasonphrase enough
+				.contentType()
+				.map( (mt) -> mt.isCompatibleWith(MediaType.APPLICATION_JSON))
+				.orElse(false);
+		
+			// return the body as a RestMessage
+		if ( hasContent && response.statusCode().is2xxSuccessful() ) {
+				return response.bodyToMono(new ParameterizedTypeReference<Set<String>>() {})
+						.map( body -> {
+							return SearchDto.build(body);
+						});
+		} else {
+			return Mono.just(	// sets empty potentials and ERROR ApiMessage
+								SearchDto.error( microService.getName(),
+								Integer.toString(response.statusCode().value()),
+								response.statusCode().getReasonPhrase() )
+							);
+		}
+	}
+	
+	/**
+	 * Handles WebClient error. Will set a Search DTO with empty potentials and ERROR Api message.
+	 * 
+	 * @param ex
+	 * @return
+	 */
+	public Mono<SearchDto> handleResponseError ( Throwable ex ) {
+		return Mono.just(
+				SearchDto.error(microService.getName(), ex.getClass().getName(), ex.getMessage())
+				);
 	}
 	
 }
