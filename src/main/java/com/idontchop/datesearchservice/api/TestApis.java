@@ -8,6 +8,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.idontchop.datesearchservice.config.enums.MicroService;
 import com.idontchop.datesearchservice.dtos.ReduceRequest;
 import com.netflix.appinfo.InstanceInfo;
 import com.netflix.discovery.EurekaClient;
@@ -33,17 +34,13 @@ public class TestApis {
 	
 	
 	/**
-	 * TODO: change to enums
+	 * Returns proper info from eureka client for requested microservice.
+	 * 
 	 * @return
 	 */
-	public InstanceInfo getLocationInfo () {
-		InstanceInfo locationService = discoveryClient.getNextServerFromEureka("location-service", false);
-		return locationService;
-	}
-	
-	public InstanceInfo getGenderInfo () {
-		InstanceInfo genderService = discoveryClient.getNextServerFromEureka("gender-service", false);
-		return genderService;
+	public InstanceInfo getServiceInfo (MicroService microService) {
+		return discoveryClient
+			.getNextServerFromEureka(microService.getName(), false);
 	}
 	
 	public Applications getServices() {
@@ -75,7 +72,7 @@ public class TestApis {
 	public Mono<String> testLocationSearch () {
 		String testurl = "/api/search-location/LOC,HOME/34.001/114.001/500";
 		
-		WebClient webClient = WebClient.create(getLocationInfo().getHomePageUrl());
+		WebClient webClient = WebClient.create(getServiceInfo(MicroService.LOCATION).getHomePageUrl());
 		
 		return webClient.get().uri(uriBuilder -> uriBuilder.path(testurl).build(0) )
 			.retrieve().bodyToMono(String.class);
@@ -95,7 +92,7 @@ public class TestApis {
 		
 		ReduceRequest reduceRequest = new ReduceRequest(username, userList);
 		
-		WebClient webClient = WebClient.create(getGenderInfo().getHomePageUrl());
+		WebClient webClient = WebClient.create(getServiceInfo(MicroService.GENDER).getHomePageUrl());
 		
 		return webClient.post().uri( uriBuilder -> uriBuilder.path(reduceGenderApi).build(0) )
 				.bodyValue(reduceRequest)

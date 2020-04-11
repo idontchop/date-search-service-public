@@ -56,6 +56,8 @@ public class AbstractEndpoints {
 		assertTrue (userList.size() > 0);
 		
 		userList.forEach( e -> logger.debug(e));
+		
+		
 	}
 	
 	@Test

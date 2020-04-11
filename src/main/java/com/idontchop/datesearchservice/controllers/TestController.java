@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.idontchop.datesearchservice.api.TestApis;
+import com.idontchop.datesearchservice.config.enums.MicroService;
 import com.netflix.appinfo.InstanceInfo;
 
 import reactor.core.publisher.Flux;
@@ -32,7 +33,7 @@ public class TestController {
 	public Map<String,Object> getLocation () {
 		Map<String,Object> infoMap = new HashMap<>();
 		
-		infoMap.put("locationInstanceInfo", testApi.getLocationInfo());
+		infoMap.put("locationInstanceInfo", testApi.getServiceInfo(MicroService.LOCATION));
 		infoMap.put("allServices", testApi.getServices());
 		return infoMap;
 	}

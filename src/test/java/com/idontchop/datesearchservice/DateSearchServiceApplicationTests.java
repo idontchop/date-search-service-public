@@ -3,6 +3,7 @@ package com.idontchop.datesearchservice;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -13,8 +14,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
 
+import com.idontchop.datesearchservice.api.MicroServiceApiAbstract;
 import com.idontchop.datesearchservice.api.TestApis;
+import com.idontchop.datesearchservice.api.microservices.GenderServiceApi;
+import com.idontchop.datesearchservice.config.enums.MicroService;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -26,6 +31,9 @@ class DateSearchServiceApplicationTests {
 
 	@Autowired
 	TestApis testApis;
+	
+	@Autowired
+	private ApplicationContext context;
 	
 	@Test
 	void contextLoads() {
@@ -63,6 +71,27 @@ class DateSearchServiceApplicationTests {
 		
 		holyshit.forEach(System.out::println);
 		assertTrue(holyshit.stream().allMatch( s -> List.of("username").contains(s)));
+		
+	}
+	
+	@Test
+	public void testAbstractApis () {
+		
+		String username = "username";
+		List<String> potentials = List.of("1","2","3","4","5","6");
+		
+		MicroServiceApiAbstract genderApi = (MicroServiceApiAbstract)
+				context.getBean(MicroService.GENDER.getClassName()); 
+		
+		
+		List<String> newPotentials = 
+				genderApi.reduce(username, potentials).block();
+		
+		assertEquals(3, newPotentials.size());
+		
+		newPotentials.forEach( e -> {
+			List.of("1","3","5").contains(e);
+		});
 		
 	}
 	
