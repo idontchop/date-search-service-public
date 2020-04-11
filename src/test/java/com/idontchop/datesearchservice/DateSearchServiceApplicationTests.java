@@ -23,6 +23,7 @@ import com.idontchop.datesearchservice.api.microservices.GenderServiceApi;
 import com.idontchop.datesearchservice.config.enums.MicroService;
 import com.idontchop.datesearchservice.dtos.ReduceRequest;
 import com.idontchop.datesearchservice.dtos.ReduceRequestWithAge;
+import com.idontchop.datesearchservice.dtos.RestMessage;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -47,9 +48,9 @@ class DateSearchServiceApplicationTests {
 	
 	@Test
 	public void testDirectCall () {
-		String test = testApis.testDirectCall().block();
+		RestMessage test = testApis.testDirectCall().block();
 		
-		assertTrue ( test.length() > 0);
+		assertTrue ( test.getMessages().get("message") != null);
 	}
 	
 	@Test
@@ -123,11 +124,11 @@ class DateSearchServiceApplicationTests {
 	@Test
 	public void testHelloWorlds() throws InterruptedException {
 		
-		Flux<String> apis = testApis.helloWorlds();
+		Flux<RestMessage> apis = testApis.helloWorlds();
 		
 		
 		apis.subscribe( e -> {
-			logger.debug(e);
+			logger.debug(e.toString());
 		}, e -> e.getMessage() );
 		
 		Thread.sleep(1000);

@@ -42,6 +42,22 @@ public class RestMessage {
 	public void setMessages(Map<String, String> messages) {
 		this.messages = messages;
 	}
+	
+	public void setMessage (String message) {
+		messages.put("message",message);
+	}
+	
+	public void setHost (String host) {
+		messages.put("host", host);
+	}
+	
+	public void setAddress (String address) {
+		messages.put("address", address);
+	}
+	
+	public void setPort (String port) {
+		messages.put("port", port);
+	}
 
 	
 }

@@ -10,6 +10,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.idontchop.datesearchservice.api.TestApis;
 import com.idontchop.datesearchservice.config.enums.MicroService;
+import com.idontchop.datesearchservice.dtos.RestMessage;
 import com.netflix.appinfo.InstanceInfo;
 
 import reactor.core.publisher.Flux;
@@ -49,12 +50,12 @@ public class TestController {
 	}
 	
 	@GetMapping ("/helloWorlds")
-	public Flux<String> getHelloWorlds() {
+	public Flux<RestMessage> getHelloWorlds() {
 		return testApi.helloWorlds();
 	}
 	
 	@GetMapping ("/testDirectCall")
-	public Mono<String> testDirectCall () {
+	public Mono<RestMessage> testDirectCall () {
 		return testApi.testDirectCall();
 	}
 }

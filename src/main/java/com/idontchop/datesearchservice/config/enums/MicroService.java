@@ -9,7 +9,8 @@ public enum MicroService {
 	MEDIADATA ("mediadata-service", ""),
 	PROFILE ("profile-service", ""),
 	LOCATION ("location-service", ""),
-	AGE ("age-service", "AgeServiceApi");
+	AGE ("age-service", "AgeServiceApi"),
+	BLOCK ("block-service", "BlockServiceApi");
 	
 	private String name;
 	

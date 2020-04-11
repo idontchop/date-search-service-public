@@ -10,6 +10,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.idontchop.datesearchservice.config.enums.MicroService;
 import com.idontchop.datesearchservice.dtos.ReduceRequest;
+import com.idontchop.datesearchservice.dtos.RestMessage;
 import com.netflix.appinfo.InstanceInfo;
 import com.netflix.discovery.EurekaClient;
 import com.netflix.discovery.shared.Applications;
@@ -49,20 +50,29 @@ public class TestApis {
 		return discoveryClient.getApplications();
 	}
 	
-	public Flux<String> helloWorlds () {
+	/**
+	 * Returns the HelloWorlds of the various microservices.
+	 * 
+	 * Largely used to test various patterns.
+	 * 
+	 * @return
+	 */
+	public Flux<RestMessage> helloWorlds () {
 		
-		List<Mono<String>> monoList =
+		List<Mono<RestMessage>> monoList =
 		getServices().getRegisteredApplications().stream().map( elem -> {
 			String serviceName = elem.getName();
 			String baseUrl = "http://" + discoveryClient.getNextServerFromEureka(serviceName, false).getAppName();
 			WebClient webClient = webClientBuilder.baseUrl(baseUrl).build();
-			Mono<String> newMono = webClient.get().uri( uriBuilder -> uriBuilder.path("/helloWorld").build() )
+			Mono<RestMessage> newMono = webClient.get().uri( uriBuilder -> uriBuilder.path("/helloWorld").build() )
 					.exchange()
 					.flatMap ( response -> {
 						if ( response.statusCode().is2xxSuccessful() ) {
-							return response.bodyToMono(String.class);
+							return response.bodyToMono(RestMessage.class);
 					} else {
-						return Mono.just("404 \"" + baseUrl + "helloWorld\"");
+						return Mono.just(RestMessage.build(serviceName)
+								.add(Integer.toString(response.rawStatusCode()),
+										response.statusCode().getReasonPhrase()));
 					}});
 					
 			return newMono;
@@ -80,13 +90,13 @@ public class TestApis {
 			.retrieve().bodyToMono(String.class);
 	}
 	
-	public Mono<String> testDirectCall () {
+	public Mono<RestMessage> testDirectCall () {
 		
 		String testurl = "http://MEDIA-SERVICE/helloWorld";
 		
 		WebClient webClient = webClientBuilder.build();
 		
-		return webClient.get().uri(testurl).retrieve().bodyToMono(String.class);
+		return webClient.get().uri(testurl).retrieve().bodyToMono(RestMessage.class);
 	}
 	
 	public Mono<List<String>> reduceGender (String username, List<String> userList) {
