@@ -78,6 +78,7 @@ public class TestApis {
 								.add(Integer.toString(response.rawStatusCode()),
 										response.statusCode().getReasonPhrase()));
 					}});
+					// https://github.com/codecentric/spring-boot-admin/blob/master/spring-boot-admin-server/src/main/java/de/codecentric/boot/admin/server/services/StatusUpdater.java#L64
 					
 			return newMono;
 		}).collect ( Collectors.toList());
