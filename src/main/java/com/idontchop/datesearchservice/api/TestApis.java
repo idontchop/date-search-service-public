@@ -67,9 +67,13 @@ public class TestApis {
 			Mono<RestMessage> newMono = webClient.get().uri( uriBuilder -> uriBuilder.path("/helloWorld").build() )
 					.exchange()
 					.flatMap ( response -> {
+						
+						// return the body as a RestMessage
 						if ( response.statusCode().is2xxSuccessful() ) {
 							return response.bodyToMono(RestMessage.class);
 					} else {
+						
+						// return the error code and message
 						return Mono.just(RestMessage.build(serviceName)
 								.add(Integer.toString(response.rawStatusCode()),
 										response.statusCode().getReasonPhrase()));
