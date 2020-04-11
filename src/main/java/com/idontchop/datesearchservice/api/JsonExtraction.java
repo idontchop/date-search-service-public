@@ -36,7 +36,7 @@ public class JsonExtraction {
 		List<String> users = new ArrayList<>();
 		
 		userList.forEach( user -> {
-			String username = user.get("content").get("username").toString();
+			String username = user.get("content").get("username").textValue();
 			if ( username != null ) {
 				users.add(username);
 			}

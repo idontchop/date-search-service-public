@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 
+import com.idontchop.datesearchservice.api.JsonExtraction;
 import com.idontchop.datesearchservice.api.MicroServiceApiAbstract;
 import com.idontchop.datesearchservice.api.TestApis;
 import com.idontchop.datesearchservice.api.microservices.GenderServiceApi;
@@ -34,6 +35,9 @@ class DateSearchServiceApplicationTests {
 	
 	@Autowired
 	private ApplicationContext context;
+	
+	@Autowired
+	private JsonExtraction jsonExtraction;
 	
 	@Test
 	void contextLoads() {
@@ -59,7 +63,9 @@ class DateSearchServiceApplicationTests {
 			for ( Object r : result ) {
 				if ( r instanceof List<?>) {
 					
-					set = set.stream().filter(((List<String>) r)::contains).collect(Collectors.toSet());
+					set = set.stream()
+							.filter(((List<String>) r)::contains)
+							.collect(Collectors.toSet());
 				}
 			}
 			return set;
@@ -75,10 +81,14 @@ class DateSearchServiceApplicationTests {
 	}
 	
 	@Test
-	public void testAbstractApis () {
+	public void testAbstractApis () throws IOException {
 		
 		String username = "username";
-		List<String> potentials = List.of("1","2","3","4","5","6");
+		List<String> potentials = 
+				jsonExtraction.userListFromLocation(testApis.testLocationSearch().block());
+		
+		assertTrue ( potentials.size() > 0);
+		assertTrue ( potentials.contains("22"));
 		
 		MicroServiceApiAbstract genderApi = (MicroServiceApiAbstract)
 				context.getBean(MicroService.GENDER.getClassName()); 
@@ -87,10 +97,10 @@ class DateSearchServiceApplicationTests {
 		List<String> newPotentials = 
 				genderApi.reduce(username, potentials).block();
 		
-		assertEquals(3, newPotentials.size());
+		assertEquals(5, newPotentials.size());
 		
 		newPotentials.forEach( e -> {
-			List.of("1","3","5").contains(e);
+			logger.debug("newPotentials: " + e);
 		});
 		
 	}

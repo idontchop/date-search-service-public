@@ -20,6 +20,8 @@ import reactor.core.publisher.Mono;
 /**
  * Testing calls to other microservices.
  * 
+ * Plan to use fragments from here.
+ * 
  * @author nathan
  *
  */
