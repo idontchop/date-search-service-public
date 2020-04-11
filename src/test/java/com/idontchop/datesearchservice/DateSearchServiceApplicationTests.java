@@ -21,6 +21,8 @@ import com.idontchop.datesearchservice.api.MicroServiceApiAbstract;
 import com.idontchop.datesearchservice.api.TestApis;
 import com.idontchop.datesearchservice.api.microservices.GenderServiceApi;
 import com.idontchop.datesearchservice.config.enums.MicroService;
+import com.idontchop.datesearchservice.dtos.ReduceRequest;
+import com.idontchop.datesearchservice.dtos.ReduceRequestWithAge;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -92,8 +94,10 @@ class DateSearchServiceApplicationTests {
 		
 		MicroServiceApiAbstract genderApi = (MicroServiceApiAbstract)
 				context.getBean(MicroService.GENDER.getClassName()); 
+		MicroServiceApiAbstract ageApi = (MicroServiceApiAbstract)
+				context.getBean(MicroService.AGE.getClassName());
 		
-		
+		// gender
 		List<String> newPotentials = 
 				genderApi.reduce(username, potentials).block();
 		
@@ -102,6 +106,17 @@ class DateSearchServiceApplicationTests {
 		newPotentials.forEach( e -> {
 			logger.debug("newPotentials: " + e);
 		});
+		
+		// Age
+		ReduceRequestWithAge reduceRequestWithAge = new ReduceRequestWithAge(username, newPotentials);
+		
+		reduceRequestWithAge.setMaxAge(80);
+		reduceRequestWithAge.setMinAge(5);
+		
+		newPotentials =
+				ageApi.reduce(reduceRequestWithAge).block();
+		
+		assertEquals(2, newPotentials.size());
 		
 	}
 	

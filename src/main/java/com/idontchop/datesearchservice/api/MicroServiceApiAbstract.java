@@ -30,7 +30,7 @@ public abstract class MicroServiceApiAbstract {
 	
 	private MicroService microService;	// set in constructor of subclass
 	
-	private String apiReduceExt = 	"/api/reduce"; 	// can be overridden by subclass if necessary
+	protected String apiReduceExt = 	"/api/reduce"; 	// can be overridden by subclass if necessary
 													// but should try to standardize this
 	
 	private EurekaClient discoveryClient;
@@ -62,6 +62,17 @@ public abstract class MicroServiceApiAbstract {
 	}
 	
 	/**
+	 * @see MicroServiceApiAbstract#reduce(ReduceRequest)
+	 */
+	public Mono<List<String>> reduce (String username, List<String> potentials) {
+		
+		// The DTO for communication with microservice
+		ReduceRequest reduceRequest = new ReduceRequest(username, potentials);
+		
+		return reduce (reduceRequest);
+	}
+	
+	/**
 	 * Standard method for calling the MicroServices' reduce api.
 	 * 
 	 * The contract here is sending a class with a username and a list of "potentials"
@@ -70,14 +81,14 @@ public abstract class MicroServiceApiAbstract {
 	 * For example, the gender-service will reduce the potentials list to users of the proper
 	 * genders.
 	 * 
+	 * For simple reducerequests, username + potential can be sent, but for others
+	 * where the service needs to know the variables, a reducerequest must be sent
+	 * 
 	 * @param username
 	 * @param potentials
 	 * @return
 	 */
-	public Mono<List<String>> reduce (String username, List<String> potentials) {
-		
-		// The DTO for communication with microservice
-		ReduceRequest reduceRequest = new ReduceRequest(username, potentials);
+	public Mono<List<String>> reduce ( ReduceRequest reduceRequest ) {
 		
 		// Use enum to find the proper microservice from Eureka
 		WebClient webClient = WebClient.create( getServiceInfo().getHomePageUrl() );

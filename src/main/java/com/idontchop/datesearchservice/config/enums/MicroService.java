@@ -8,7 +8,8 @@ public enum MicroService {
 	GENDER ("gender-service", "GenderServiceApi"),
 	MEDIADATA ("mediadata-service", ""),
 	PROFILE ("profile-service", ""),
-	LOCATION ("location-service", "");
+	LOCATION ("location-service", ""),
+	AGE ("age-service", "AgeServiceApi");
 	
 	private String name;
 	
