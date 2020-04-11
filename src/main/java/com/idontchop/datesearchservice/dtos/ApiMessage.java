@@ -37,16 +37,23 @@ public class ApiMessage {
 		return level;
 	}
 
-	public void setLevel(String level) {
+	public ApiMessage setLevel(String level) {
 		this.level = level;
+		return this;
 	}
 
 	public String getMessage() {
 		return message;
 	}
 
-	public void setMessage(String message) {
+	public ApiMessage setMessage(String message) {
 		this.message = message;
+		return this;
+	}
+	
+	public ApiMessage from (String message) {
+		this.message = message;
+		return this;
 	}
 	
 	

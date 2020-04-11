@@ -9,8 +9,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.idontchop.datesearchservice.config.enums.MicroService;
+import com.idontchop.datesearchservice.dtos.ApiMessage;
 import com.idontchop.datesearchservice.dtos.ReduceRequest;
 import com.idontchop.datesearchservice.dtos.RestMessage;
+import com.idontchop.datesearchservice.dtos.SearchDto;
 import com.netflix.appinfo.InstanceInfo;
 import com.netflix.discovery.EurekaClient;
 import com.netflix.discovery.shared.Applications;
@@ -57,25 +59,37 @@ public class TestApis {
 	 * 
 	 * @return
 	 */
-	public Flux<RestMessage> helloWorlds () {
+	public Flux<SearchDto> helloWorlds () {
 		
-		List<Mono<RestMessage>> monoList =
+		List<Mono<SearchDto>> monoList =
 		getServices().getRegisteredApplications().stream().map( elem -> {
 			String serviceName = elem.getName();
 			String baseUrl = "http://" + discoveryClient.getNextServerFromEureka(serviceName, false).getAppName();
 			WebClient webClient = webClientBuilder.baseUrl(baseUrl).build();
-			Mono<RestMessage> newMono = webClient.get().uri( uriBuilder -> uriBuilder.path("/helloWorld").build() )
+			Mono<SearchDto> newMono = webClient.get().uri( uriBuilder -> uriBuilder.path("/helloWorld").build() )
 					.exchange()
 					.flatMap ( response -> {
+					
 						// return the body as a RestMessage
 						if ( response.statusCode().is2xxSuccessful() ) {
-							return response.bodyToMono(RestMessage.class);
+							return response.bodyToMono(RestMessage.class).map( body -> {
+								SearchDto dto = new SearchDto();								
+								dto.add(serviceName, new ApiMessage("test","test"));
+								return dto;
+							});
 					} else {
-						return Mono.just(RestMessage.build(serviceName)
-								.add(Integer.toString(response.rawStatusCode()),
-										response.statusCode().getReasonPhrase()));
+						SearchDto dto = new SearchDto();
+						dto.add("error", new ApiMessage("test","test"));
+						return Mono.just(dto);
+						// return the error code and message
+						//return Mono.just(RestMessage.build(serviceName)
+						//		.add(Integer.toString(response.rawStatusCode()),
+						//				response.statusCode().getReasonPhrase()));
 					}});
-					
+					// https://github.com/codecentric/spring-boot-admin/blob/master/spring-boot-admin-server/src/main/java/de/codecentric/boot/admin/server/services/StatusUpdater.java#L64
+					// create a statusinfo class to hold response info
+					// Have searchdto store the statusinfos and lists 
+			
 			return newMono;
 		}).collect ( Collectors.toList());
 		
