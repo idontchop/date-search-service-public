@@ -24,6 +24,7 @@ import com.idontchop.datesearchservice.config.enums.MicroService;
 import com.idontchop.datesearchservice.dtos.ReduceRequest;
 import com.idontchop.datesearchservice.dtos.ReduceRequestWithAge;
 import com.idontchop.datesearchservice.dtos.RestMessage;
+import com.idontchop.datesearchservice.dtos.SearchDto;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -124,7 +125,7 @@ class DateSearchServiceApplicationTests {
 	@Test
 	public void testHelloWorlds() throws InterruptedException {
 		
-		Flux<RestMessage> apis = testApis.helloWorlds();
+		Flux<SearchDto> apis = testApis.helloWorlds();
 		
 		
 		apis.subscribe( e -> {
