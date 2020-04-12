@@ -3,6 +3,8 @@ package com.idontchop.datesearchservice.api;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import com.idontchop.datesearchservice.dtos.SearchRequest;
@@ -22,6 +24,9 @@ import com.idontchop.datesearchservice.dtos.SearchRequest;
  */
 @Service
 public class SearchPotentialsApi {
+	
+	@Autowired
+	private ApplicationContext context;
 	
 	public SearchPotentialsApi () {};
 	
@@ -43,6 +48,10 @@ public class SearchPotentialsApi {
 	
 	public static SearchPotentialsApi from (SearchRequest searchRequest ) {
 		SearchPotentialsApi spa = build();
+		
+		spa.baseApiCall = (MicroServiceApiAbstract) spa.context.getBean
+				(searchRequest.getBaseSearch().getClassName());
+		
 		
 		return spa;
 	}
