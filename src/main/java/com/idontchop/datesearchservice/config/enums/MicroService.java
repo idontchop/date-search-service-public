@@ -10,7 +10,8 @@ public enum MicroService {
 	PROFILE ("profile-service", ""),
 	LOCATION ("location-service", ""),
 	AGE ("age-service", "AgeServiceApi"),
-	BLOCK ("block-service", "BlockServiceApi");
+	BLOCK ("block-service", "BlockServiceApi"),
+	LIKE ("like-service", "LikeServiceApi");
 	
 	private String name;
 	

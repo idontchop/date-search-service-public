@@ -1,10 +1,8 @@
 package com.idontchop.datesearchservice.dtos;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -28,6 +26,9 @@ public class SearchDto {
 	private LocalDateTime created = LocalDateTime.now();
 	
 	private Set<String> potentials = new HashSet<>();
+	
+	// Used for tertiary requests. (Likes)
+	private Map<String, Set<String>> matches = new HashMap<>();
 	
 	private Map<String,ApiMessage> apiMessages = new HashMap<>();
 
@@ -61,11 +62,8 @@ public class SearchDto {
 	}
 	
 	public static SearchDto error ( String service, String error, String message ) {
-		SearchDto newDto = build();
-		ApiMessage apiM = new ApiMessage();
-		apiM.setLevel("ERROR"); apiM.setMessage(message);
-		apiM.setError(error);
-		newDto.add(service, apiM);
+		SearchDto newDto = build();		
+		newDto.add(service, ApiMessage.error(error).setMessage(message) );
 		return newDto;
 	}
 	
@@ -106,6 +104,14 @@ public class SearchDto {
 		return this;
 	}
 	
+	public Map<String, Set<String>> getMatches() {
+		return matches;
+	}
+
+	public void setMatches(Map<String, Set<String>> matches) {
+		this.matches = matches;
+	}
+
 	public boolean isError () {
 		for ( ApiMessage message : apiMessages.values() ) {
 			if ( message.getLevel().equals("ERROR")) return true;

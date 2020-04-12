@@ -163,13 +163,12 @@ class DateSearchServiceApplicationTests {
 				blockApi.reduce(username,potentials));
 		
 		SearchDto result = Mono.zip(newPotentials, resultMonos -> {
-			if ( resultMonos.length == 1 ) return (SearchDto) resultMonos[0];
-			else {
-				for ( int i = 1; i < resultMonos.length; i++) {
-					((SearchDto) resultMonos[0]).intersect((SearchDto) resultMonos[i]);
-				}
-				return (SearchDto) resultMonos[0];
+
+			for ( int i = 1; i < resultMonos.length; i++) {
+				((SearchDto) resultMonos[0]).intersect((SearchDto) resultMonos[i]);
 			}
+			return (SearchDto) resultMonos[0];
+			
 		}).block();
 		
 		assertTrue( result.getPotentials().contains("30"));

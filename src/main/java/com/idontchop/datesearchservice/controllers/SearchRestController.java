@@ -18,7 +18,7 @@ public class SearchRestController {
 	@Autowired
 	TestApis testApis;
 	
-	@GetMapping
+	
 	public Mono<ServerResponse> searchTest (ServerRequest r) {
 		return ServerResponse
 				.ok()
