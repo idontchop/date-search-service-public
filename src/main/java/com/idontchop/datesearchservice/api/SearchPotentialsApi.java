@@ -2,11 +2,13 @@ package com.idontchop.datesearchservice.api;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
+import com.idontchop.datesearchservice.config.enums.MicroService;
 import com.idontchop.datesearchservice.dtos.SearchRequest;
 
 /**
@@ -35,7 +37,7 @@ public class SearchPotentialsApi {
 	
 	// Called to reduce the potentials obtained from baseApiCall
 	// This class sets required reduce calls [blocks, hides] (can be overridden with noBlockCall)
-	private List<MicroServiceApiAbstract> reduceCalls = new ArrayList<>();
+	private List<MicroServiceApiAbstract> reduceApiCalls = new ArrayList<>();
 	
 	/*
 	 * Build methods
@@ -49,11 +51,30 @@ public class SearchPotentialsApi {
 	public static SearchPotentialsApi from (SearchRequest searchRequest ) {
 		SearchPotentialsApi spa = build();
 		
-		spa.baseApiCall = (MicroServiceApiAbstract) spa.context.getBean
-				(searchRequest.getBaseSearch().getClassName());
+		spa.baseApi( (MicroServiceApiAbstract) spa.context.getBean
+				(searchRequest.getBaseSearch().getClassName()))
+			.reduceApisServices( searchRequest.getReduceSearch());
 		
+		// should be good here to get a working api up.
+			
 		
 		return spa;
+	}
+	
+	public SearchPotentialsApi baseApi(MicroServiceApiAbstract baseApiCall) {
+		this.baseApiCall = baseApiCall;
+		return this;
+	}
+	
+	public SearchPotentialsApi reduceApis(List<MicroServiceApiAbstract> reduceApiCalls) {
+		this.reduceApiCalls = reduceApiCalls;
+		return this;
+	}
+	
+	public SearchPotentialsApi reduceApisServices ( List<MicroService> services ) {
+		this.reduceApiCalls = services.stream().map( e -> 
+			(MicroServiceApiAbstract) context.getBean(e.getClassName())).collect(Collectors.toList());
+		return this;
 	}
 	
 
