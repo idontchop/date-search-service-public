@@ -67,7 +67,7 @@ public abstract class MicroServiceApiAbstract {
 	 * 
 	 * @return
 	 */
-	private InstanceInfo getServiceInfo () {
+	private InstanceInfo getServiceInfo () throws RuntimeException {
 		return discoveryClient
 			.getNextServerFromEureka(microService.getName(), false);
 	}
@@ -102,8 +102,14 @@ public abstract class MicroServiceApiAbstract {
 	public Mono<SearchDto> reduce ( ReduceRequest reduceRequest ) {
 		
 		// Use enum to find the proper microservice from Eureka
-		WebClient webClient = webClientBuilder
+		WebClient webClient;
+		try {
+			webClient = webClientBuilder
 				.baseUrl("http://" + getServiceInfo().getAppName()).build();
+		} catch (RuntimeException ex ) {
+			// reason: Service not registered
+			return handleResponseError(ex);
+		}
 		
 		// API call will return a Mono with a new List of potentials
 		return webClient.post().uri( uriBuilder -> uriBuilder.path(apiReduceExt).build(0) )

@@ -15,7 +15,11 @@ public class SearchEndpointConfiguration {
 	
 	@Bean
 	RouterFunction<ServerResponse> routes (SearchRestController handler) {
-		return route ( GET("/search/searchTest"), handler::searchTest);
+		return route ()
+				.GET("/search/searchTest", handler::searchTest)
+				.POST("/search/reduceTest", handler::reduceTest)					
+				.build();
+				
 	}
 
 }
