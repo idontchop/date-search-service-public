@@ -185,8 +185,13 @@ public abstract class MicroServiceApiAbstract {
 		final String finalUrlExt = callUrlExt;		// for lambda call
 		
 		// Use enum to find the proper microservice from Eureka
-		WebClient webClient = webClientBuilder
+		WebClient webClient;
+		try {
+		webClient = webClientBuilder
 				.baseUrl("http://" + getServiceInfo().getAppName()).build();
+		} catch ( RuntimeException ex ) {
+			return Mono.error(ex);
+		}
 		
 		// API call will return a Mono with a new List of potentials
 		return webClient.get().uri( uriBuilder -> uriBuilder.path(finalUrlExt).build(0) )
