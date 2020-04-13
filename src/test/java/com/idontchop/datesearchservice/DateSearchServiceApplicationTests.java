@@ -18,6 +18,7 @@ import org.springframework.context.ApplicationContext;
 
 import com.idontchop.datesearchservice.api.JsonExtraction;
 import com.idontchop.datesearchservice.api.MicroServiceApiAbstract;
+import com.idontchop.datesearchservice.api.SearchPotentialsApi;
 import com.idontchop.datesearchservice.api.TestApis;
 import com.idontchop.datesearchservice.api.microservices.GenderServiceApi;
 import com.idontchop.datesearchservice.config.enums.MicroService;
@@ -25,6 +26,7 @@ import com.idontchop.datesearchservice.dtos.ReduceRequest;
 import com.idontchop.datesearchservice.dtos.ReduceRequestWithAge;
 import com.idontchop.datesearchservice.dtos.RestMessage;
 import com.idontchop.datesearchservice.dtos.SearchDto;
+import com.idontchop.datesearchservice.dtos.SearchRequest;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -52,6 +54,50 @@ class DateSearchServiceApplicationTests {
 		RestMessage test = testApis.testDirectCall().block();
 		
 		assertTrue ( test.getMessages().get("message") != null);
+	}
+	
+	@Test
+	public void testSearchPotentials () {
+		SearchRequest searchRequest = new SearchRequest();
+		List<MicroService> reduceSearches =
+				List.of(MicroService.AGE,MicroService.GENDER);
+		
+		int maxAge = 80, minAge = 5, range = 500;
+		double lat = 34.001, lng = 114.001;
+		String locationTypes = "LOC,HOME";
+		String username  = "username";
+		
+		searchRequest.setUsername(username);
+		searchRequest.setBaseSearch(MicroService.LOCATION);
+		searchRequest.setReduceSearch(reduceSearches);
+		searchRequest.setLocationTypes(locationTypes);
+		searchRequest.setMaxAge(maxAge);
+		searchRequest.setMinAge(minAge);
+		searchRequest.setLat(lat); searchRequest.setLng(lng);
+		searchRequest.setRange(range);
+		searchRequest.setSelections(List.of());
+		
+		SearchPotentialsApi api = SearchPotentialsApi.from(searchRequest, context);
+		
+		// test api build
+	
+		assertEquals ( username, api.getReduceRequest().getName());
+		assertEquals ( maxAge, api.getReduceRequest().getMaxAge() );
+		assertEquals ( minAge, api.getReduceRequest().getMinAge() );
+		assertEquals ( String.valueOf(lat), api.getBaseApiArgs()[1]);
+		assertEquals ( String.valueOf(lng), api.getBaseApiArgs()[2]);
+		assertEquals ( String.valueOf(range), api.getBaseApiArgs()[3]);
+		assertEquals ( locationTypes, api.getBaseApiArgs()[0]);
+		assertEquals ( 3, api.getReduceApiCalls().size());
+		
+		Mono<SearchDto> m = api.run();
+		SearchDto p = m.block();
+		
+		logger.debug("after block");
+		assertTrue ( p != null);
+		
+		assertTrue ( p.getPotentials().contains("30"));
+		
 	}
 	
 	@Test

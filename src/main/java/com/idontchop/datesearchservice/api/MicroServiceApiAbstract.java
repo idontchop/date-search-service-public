@@ -42,6 +42,8 @@ public abstract class MicroServiceApiAbstract {
 	protected String apiReduceExt = 	"/api/reduce"; 	// can be overridden by subclass if necessary
 													// but should try to standardize this
 	
+	protected String apiBaseExt  =		"/api/baseSearch";	// The api call to get a fresh list
+	
 	private EurekaClient discoveryClient;
 	@Autowired public final void setEurekaClient(EurekaClient discoveryClient) {
 		this.discoveryClient = discoveryClient;
@@ -100,7 +102,8 @@ public abstract class MicroServiceApiAbstract {
 	public Mono<SearchDto> reduce ( ReduceRequest reduceRequest ) {
 		
 		// Use enum to find the proper microservice from Eureka
-		WebClient webClient = WebClient.create( getServiceInfo().getHomePageUrl() );
+		WebClient webClient = webClientBuilder
+				.baseUrl("http://" + getServiceInfo().getAppName()).build();
 		
 		// API call will return a Mono with a new List of potentials
 		return webClient.post().uri( uriBuilder -> uriBuilder.path(apiReduceExt).build(0) )
@@ -137,10 +140,10 @@ public abstract class MicroServiceApiAbstract {
 						});
 		} else {
 			return Mono.just(	// sets empty potentials and ERROR ApiMessage
-								SearchDto.error( microService.getName(),
-								Integer.toString(response.statusCode().value()),
-								response.statusCode().getReasonPhrase() )
-							);
+						SearchDto.error( microService.getName(),
+						Integer.toString(response.statusCode().value()),
+						response.statusCode().getReasonPhrase() )
+						);
 		}
 	}
 	
@@ -154,6 +157,36 @@ public abstract class MicroServiceApiAbstract {
 		return Mono.just(
 				SearchDto.error(microService.getName(), ex.getClass().getName(), ex.getMessage())
 				);
+	}
+	
+	/**
+	 * Unlike the reduce call, an error in this call will not allow the search process
+	 * to continue.
+	 * 
+	 * @param args
+	 * @return
+	 */
+	public Mono<String> baseSearch ( String... args ) {
+		
+		// Append args in order on the baseSearch ext and return a string response
+		// which the caller can decode.
+		
+		String callUrlExt = apiBaseExt;
+		for ( String s : args ) {
+			callUrlExt += ("/" + s);
+		}
+		
+		final String finalUrlExt = callUrlExt;		// for lambda call
+		
+		// Use enum to find the proper microservice from Eureka
+		WebClient webClient = webClientBuilder
+				.baseUrl("http://" + getServiceInfo().getAppName()).build();
+		
+		// API call will return a Mono with a new List of potentials
+		return webClient.get().uri( uriBuilder -> uriBuilder.path(finalUrlExt).build(0) )
+				.retrieve()
+				.bodyToMono(String.class);
+		
 	}
 	
 }

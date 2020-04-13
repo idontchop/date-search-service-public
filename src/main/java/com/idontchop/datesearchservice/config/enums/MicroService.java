@@ -8,7 +8,7 @@ public enum MicroService {
 	GENDER ("gender-service", "GenderServiceApi"),
 	MEDIADATA ("mediadata-service", ""),
 	PROFILE ("profile-service", ""),
-	LOCATION ("location-service", ""),
+	LOCATION ("location-service", "LocationServiceApi"),
 	AGE ("age-service", "AgeServiceApi"),
 	BLOCK ("block-service", "BlockServiceApi"),
 	LIKE ("like-service", "LikeServiceApi");

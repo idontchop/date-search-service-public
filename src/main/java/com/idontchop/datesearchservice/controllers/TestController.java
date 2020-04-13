@@ -1,5 +1,6 @@
 package com.idontchop.datesearchservice.controllers;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,7 +47,7 @@ public class TestController {
 	
 	
 	@GetMapping ("/testLocation")
-	public Mono<String> testLocation () {
+	public Mono<String> testLocation () throws IOException, RuntimeException {
 		return testApi.testLocationSearch();
 	}
 	

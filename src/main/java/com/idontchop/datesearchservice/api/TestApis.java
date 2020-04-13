@@ -1,17 +1,20 @@
 package com.idontchop.datesearchservice.api;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.idontchop.datesearchservice.api.microservices.LocationServiceApi;
 import com.idontchop.datesearchservice.config.enums.MicroService;
 import com.idontchop.datesearchservice.dtos.ApiMessage;
 import com.idontchop.datesearchservice.dtos.ReduceRequest;
@@ -42,6 +45,9 @@ public class TestApis {
 	
 	@Autowired
 	private WebClient.Builder webClientBuilder;
+	
+	@Autowired
+	private ApplicationContext context;
 	
 	
 	/**
@@ -113,12 +119,15 @@ public class TestApis {
 	}
 	
 	public Mono<String> testLocationSearch () {
-		String testurl = "/api/search-location/LOC,HOME/34.001/114.001/500";
+		//String testurl = "/api/search-location/LOC,HOME/34.001/114.001/500";
+		LocationServiceApi locationApi;
+
+			locationApi = (LocationServiceApi) context
+					.getBean(MicroService.LOCATION.getClassName());
+
 		
-		WebClient webClient = WebClient.create(getServiceInfo(MicroService.LOCATION).getHomePageUrl());
+		return locationApi.baseSearch("LOC,HOME","34.001","114.001","500");
 		
-		return webClient.get().uri(uriBuilder -> uriBuilder.path(testurl).build(0) )
-			.retrieve().bodyToMono(String.class);
 	}
 	
 	public Mono<RestMessage> testDirectCall () {

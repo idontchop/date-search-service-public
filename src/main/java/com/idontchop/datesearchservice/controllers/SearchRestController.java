@@ -1,6 +1,8 @@
 package com.idontchop.datesearchservice.controllers;
 
 
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -1,11 +1,8 @@
 package com.idontchop.datesearchservice.dtos;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import com.idontchop.datesearchservice.config.enums.BaseSearch;
 import com.idontchop.datesearchservice.config.enums.MicroService;
 
 /**
@@ -17,6 +14,8 @@ import com.idontchop.datesearchservice.config.enums.MicroService;
 public class SearchRequest {
 	
 	public SearchRequest () {}
+	
+	private String username;
 
 	// Set by front end
 	private MicroService baseSearch = MicroService.LOCATION;
@@ -26,15 +25,15 @@ public class SearchRequest {
 	
 	private double lat;
 	private double lng;
+	private int range;
+	private String locationTypes;
 	
 	private int minAge;
 	private int maxAge;
 	
-	private GenericSelector gender;
-	private GenericSelector interestedIn;
-	
 	private List<String> toggles = new ArrayList<>();		// lists toggles such as "showConnections" if only mutual likes searched for
 	
+	// For profile traits
 	private List<GenericSelector> selections = new ArrayList<>();
 
 	public MicroService getBaseSearch() {
@@ -93,28 +92,36 @@ public class SearchRequest {
 		this.reduceSearch = reduceSearch;
 	}
 
-	public GenericSelector getGender() {
-		return gender;
-	}
-
-	public void setGender(GenericSelector gender) {
-		this.gender = gender;
-	}
-
-	public GenericSelector getInterestedIn() {
-		return interestedIn;
-	}
-
-	public void setInterestedIn(GenericSelector interestedIn) {
-		this.interestedIn = interestedIn;
-	}
-
 	public List<String> getToggles() {
 		return toggles;
 	}
 
 	public void setToggles(List<String> toggles) {
 		this.toggles = toggles;
+	}
+
+	public int getRange() {
+		return range;
+	}
+
+	public void setRange(int range) {
+		this.range = range;
+	}
+
+	public String getLocationTypes() {
+		return locationTypes;
+	}
+
+	public void setLocationTypes(String locationTypes) {
+		this.locationTypes = locationTypes;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
 	}
 	
 	
