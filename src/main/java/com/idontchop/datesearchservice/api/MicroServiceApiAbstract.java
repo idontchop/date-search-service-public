@@ -187,7 +187,7 @@ public abstract class MicroServiceApiAbstract {
 		// Use enum to find the proper microservice from Eureka
 		WebClient webClient;
 		try {
-		webClient = webClientBuilder
+			webClient = webClientBuilder
 				.baseUrl("http://" + getServiceInfo().getAppName()).build();
 		} catch ( RuntimeException ex ) {
 			return Mono.error(ex);
