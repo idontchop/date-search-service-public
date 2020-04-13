@@ -23,7 +23,8 @@ For example, a search in a certain location, age group, and non-smoker/non-drink
 3. Additionally arrange the results based on AI of the user.
 
 See the following for work completed for this demonstration:
-[SearchPotentialsApi.java]https://github.com/idontchop/date-search-service/blob/master/src/main/java/com/idontchop/datesearchservice/api/SearchPotentialsApi.java
+
+https://github.com/idontchop/date-search-service/blob/master/src/main/java/com/idontchop/datesearchservice/api/SearchPotentialsApi.java
 
 # Modern Pay Structure
 
