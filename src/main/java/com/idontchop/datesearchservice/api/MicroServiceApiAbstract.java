@@ -44,6 +44,7 @@ public abstract class MicroServiceApiAbstract {
 	
 	protected String apiBaseExt  =		"/api/baseSearch";	// The api call to get a fresh list
 	
+	// Discovery bean
 	private EurekaClient discoveryClient;
 	@Autowired public final void setEurekaClient(EurekaClient discoveryClient) {
 		this.discoveryClient = discoveryClient;
