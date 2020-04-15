@@ -1,0 +1,733 @@
+{
+"results": {
+"averageDistance": {
+"value": 18.607502851423607,
+"metric": "KILOMETERS"
+},
+"content": [
+{
+"content": {
+"id": "5e785ccf26af8c31c83b0b8c",
+"username": "22",
+"pingType": "LOC",
+"loc": {
+"x": 115.1318,
+"y": 36.1288
+},
+"created": "2020-03-23T06:53:03.069+0000"
+},
+"distance": {
+"value": 18.607502851423607,
+"metric": "KILOMETERS"
+}
+},
+{
+"content": {
+"id": "5e785ccf26af8c31c83b0b8e",
+"username": "26",
+"pingType": "LOC",
+"loc": {
+"x": 115.1318,
+"y": 36.1288
+},
+"created": "2020-03-23T06:53:03.088+0000"
+},
+"distance": {
+"value": 18.607502851423607,
+"metric": "KILOMETERS"
+}
+},
+{
+"content": {
+"id": "5e785ccf26af8c31c83b0b92",
+"username": "34",
+"pingType": "LOC",
+"loc": {
+"x": 115.1318,
+"y": 36.1288
+},
+"created": "2020-03-23T06:53:03.092+0000"
+},
+"distance": {
+"value": 18.607502851423607,
+"metric": "KILOMETERS"
+}
+},
+{
+"content": {
+"id": "5e78f4ad855c334e774d69d9",
+"username": "32",
+"pingType": "LOC",
+"loc": {
+"x": 115.1318,
+"y": 36.1288
+},
+"created": "2020-03-23T17:41:01.936+0000"
+},
+"distance": {
+"value": 18.607502851423607,
+"metric": "KILOMETERS"
+}
+},
+{
+"content": {
+"id": "5e78fa88ab168322aabd3095",
+"username": "28",
+"pingType": "LOC",
+"loc": {
+"x": 115.1318,
+"y": 36.1288
+},
+"created": "2020-03-23T18:06:00.315+0000"
+},
+"distance": {
+"value": 18.607502851423607,
+"metric": "KILOMETERS"
+}
+},
+{
+"content": {
+"id": "5e78fa9f524a184f0c711f48",
+"username": "38",
+"pingType": "LOC",
+"loc": {
+"x": 115.1318,
+"y": 36.1288
+},
+"created": "2020-03-23T18:06:23.066+0000"
+},
+"distance": {
+"value": 18.607502851423607,
+"metric": "KILOMETERS"
+}
+},
+{
+"content": {
+"id": "5e78fa9f524a184f0c711f47",
+"username": "36",
+"pingType": "LOC",
+"loc": {
+"x": 115.1318,
+"y": 36.1288
+},
+"created": "2020-03-23T18:06:23.065+0000"
+},
+"distance": {
+"value": 18.607502851423607,
+"metric": "KILOMETERS"
+}
+},
+{
+"content": {
+"id": "5e78fa9f524a184f0c711f46",
+"username": "34",
+"pingType": "LOC",
+"loc": {
+"x": 115.1318,
+"y": 36.1288
+},
+"created": "2020-03-23T18:06:23.065+0000"
+},
+"distance": {
+"value": 18.607502851423607,
+"metric": "KILOMETERS"
+}
+},
+{
+"content": {
+"id": "5e78fa9f524a184f0c711f45",
+"username": "32",
+"pingType": "LOC",
+"loc": {
+"x": 115.1318,
+"y": 36.1288
+},
+"created": "2020-03-23T18:06:23.064+0000"
+},
+"distance": {
+"value": 18.607502851423607,
+"metric": "KILOMETERS"
+}
+},
+{
+"content": {
+"id": "5e78fa9f524a184f0c711f44",
+"username": "30",
+"pingType": "LOC",
+"loc": {
+"x": 115.1318,
+"y": 36.1288
+},
+"created": "2020-03-23T18:06:23.063+0000"
+},
+"distance": {
+"value": 18.607502851423607,
+"metric": "KILOMETERS"
+}
+},
+{
+"content": {
+"id": "5e78fa9f524a184f0c711f43",
+"username": "28",
+"pingType": "LOC",
+"loc": {
+"x": 115.1318,
+"y": 36.1288
+},
+"created": "2020-03-23T18:06:23.062+0000"
+},
+"distance": {
+"value": 18.607502851423607,
+"metric": "KILOMETERS"
+}
+},
+{
+"content": {
+"id": "5e78fa9f524a184f0c711f42",
+"username": "26",
+"pingType": "LOC",
+"loc": {
+"x": 115.1318,
+"y": 36.1288
+},
+"created": "2020-03-23T18:06:23.061+0000"
+},
+"distance": {
+"value": 18.607502851423607,
+"metric": "KILOMETERS"
+}
+},
+{
+"content": {
+"id": "5e78fa9f524a184f0c711f41",
+"username": "24",
+"pingType": "LOC",
+"loc": {
+"x": 115.1318,
+"y": 36.1288
+},
+"created": "2020-03-23T18:06:23.060+0000"
+},
+"distance": {
+"value": 18.607502851423607,
+"metric": "KILOMETERS"
+}
+},
+{
+"content": {
+"id": "5e78fa9f524a184f0c711f40",
+"username": "22",
+"pingType": "LOC",
+"loc": {
+"x": 115.1318,
+"y": 36.1288
+},
+"created": "2020-03-23T18:06:23.042+0000"
+},
+"distance": {
+"value": 18.607502851423607,
+"metric": "KILOMETERS"
+}
+},
+{
+"content": {
+"id": "5e78fa88ab168322aabd309a",
+"username": "38",
+"pingType": "LOC",
+"loc": {
+"x": 115.1318,
+"y": 36.1288
+},
+"created": "2020-03-23T18:06:00.318+0000"
+},
+"distance": {
+"value": 18.607502851423607,
+"metric": "KILOMETERS"
+}
+},
+{
+"content": {
+"id": "5e78fa88ab168322aabd3099",
+"username": "36",
+"pingType": "LOC",
+"loc": {
+"x": 115.1318,
+"y": 36.1288
+},
+"created": "2020-03-23T18:06:00.318+0000"
+},
+"distance": {
+"value": 18.607502851423607,
+"metric": "KILOMETERS"
+}
+},
+{
+"content": {
+"id": "5e78fa88ab168322aabd3098",
+"username": "34",
+"pingType": "LOC",
+"loc": {
+"x": 115.1318,
+"y": 36.1288
+},
+"created": "2020-03-23T18:06:00.317+0000"
+},
+"distance": {
+"value": 18.607502851423607,
+"metric": "KILOMETERS"
+}
+},
+{
+"content": {
+"id": "5e78fa88ab168322aabd3097",
+"username": "32",
+"pingType": "LOC",
+"loc": {
+"x": 115.1318,
+"y": 36.1288
+},
+"created": "2020-03-23T18:06:00.316+0000"
+},
+"distance": {
+"value": 18.607502851423607,
+"metric": "KILOMETERS"
+}
+},
+{
+"content": {
+"id": "5e78fa88ab168322aabd3094",
+"username": "26",
+"pingType": "LOC",
+"loc": {
+"x": 115.1318,
+"y": 36.1288
+},
+"created": "2020-03-23T18:06:00.314+0000"
+},
+"distance": {
+"value": 18.607502851423607,
+"metric": "KILOMETERS"
+}
+},
+{
+"content": {
+"id": "5e78fa88ab168322aabd3096",
+"username": "30",
+"pingType": "LOC",
+"loc": {
+"x": 115.1318,
+"y": 36.1288
+},
+"created": "2020-03-23T18:06:00.316+0000"
+},
+"distance": {
+"value": 18.607502851423607,
+"metric": "KILOMETERS"
+}
+},
+{
+"content": {
+"id": "5e78fa88ab168322aabd3093",
+"username": "24",
+"pingType": "LOC",
+"loc": {
+"x": 115.1318,
+"y": 36.1288
+},
+"created": "2020-03-23T18:06:00.313+0000"
+},
+"distance": {
+"value": 18.607502851423607,
+"metric": "KILOMETERS"
+}
+},
+{
+"content": {
+"id": "5e78fa88ab168322aabd3092",
+"username": "22",
+"pingType": "LOC",
+"loc": {
+"x": 115.1318,
+"y": 36.1288
+},
+"created": "2020-03-23T18:06:00.293+0000"
+},
+"distance": {
+"value": 18.607502851423607,
+"metric": "KILOMETERS"
+}
+},
+{
+"content": {
+"id": "5e78f4f7257b54228e5ac264",
+"username": "38",
+"pingType": "LOC",
+"loc": {
+"x": 115.1318,
+"y": 36.1288
+},
+"created": "2020-03-23T17:42:15.527+0000"
+},
+"distance": {
+"value": 18.607502851423607,
+"metric": "KILOMETERS"
+}
+},
+{
+"content": {
+"id": "5e78f4f7257b54228e5ac263",
+"username": "36",
+"pingType": "LOC",
+"loc": {
+"x": 115.1318,
+"y": 36.1288
+},
+"created": "2020-03-23T17:42:15.526+0000"
+},
+"distance": {
+"value": 18.607502851423607,
+"metric": "KILOMETERS"
+}
+},
+{
+"content": {
+"id": "5e78f4f7257b54228e5ac262",
+"username": "34",
+"pingType": "LOC",
+"loc": {
+"x": 115.1318,
+"y": 36.1288
+},
+"created": "2020-03-23T17:42:15.524+0000"
+},
+"distance": {
+"value": 18.607502851423607,
+"metric": "KILOMETERS"
+}
+},
+{
+"content": {
+"id": "5e78f4f7257b54228e5ac261",
+"username": "32",
+"pingType": "LOC",
+"loc": {
+"x": 115.1318,
+"y": 36.1288
+},
+"created": "2020-03-23T17:42:15.523+0000"
+},
+"distance": {
+"value": 18.607502851423607,
+"metric": "KILOMETERS"
+}
+},
+{
+"content": {
+"id": "5e78f4f7257b54228e5ac260",
+"username": "30",
+"pingType": "LOC",
+"loc": {
+"x": 115.1318,
+"y": 36.1288
+},
+"created": "2020-03-23T17:42:15.522+0000"
+},
+"distance": {
+"value": 18.607502851423607,
+"metric": "KILOMETERS"
+}
+},
+{
+"content": {
+"id": "5e78f4f7257b54228e5ac25f",
+"username": "28",
+"pingType": "LOC",
+"loc": {
+"x": 115.1318,
+"y": 36.1288
+},
+"created": "2020-03-23T17:42:15.521+0000"
+},
+"distance": {
+"value": 18.607502851423607,
+"metric": "KILOMETERS"
+}
+},
+{
+"content": {
+"id": "5e78f4f7257b54228e5ac25e",
+"username": "26",
+"pingType": "LOC",
+"loc": {
+"x": 115.1318,
+"y": 36.1288
+},
+"created": "2020-03-23T17:42:15.520+0000"
+},
+"distance": {
+"value": 18.607502851423607,
+"metric": "KILOMETERS"
+}
+},
+{
+"content": {
+"id": "5e78f4f7257b54228e5ac25d",
+"username": "24",
+"pingType": "LOC",
+"loc": {
+"x": 115.1318,
+"y": 36.1288
+},
+"created": "2020-03-23T17:42:15.519+0000"
+},
+"distance": {
+"value": 18.607502851423607,
+"metric": "KILOMETERS"
+}
+},
+{
+"content": {
+"id": "5e78f4f7257b54228e5ac25c",
+"username": "22",
+"pingType": "LOC",
+"loc": {
+"x": 115.1318,
+"y": 36.1288
+},
+"created": "2020-03-23T17:42:15.501+0000"
+},
+"distance": {
+"value": 18.607502851423607,
+"metric": "KILOMETERS"
+}
+},
+{
+"content": {
+"id": "5e78f4ad855c334e774d69dc",
+"username": "38",
+"pingType": "LOC",
+"loc": {
+"x": 115.1318,
+"y": 36.1288
+},
+"created": "2020-03-23T17:41:01.938+0000"
+},
+"distance": {
+"value": 18.607502851423607,
+"metric": "KILOMETERS"
+}
+},
+{
+"content": {
+"id": "5e78f4ad855c334e774d69db",
+"username": "36",
+"pingType": "LOC",
+"loc": {
+"x": 115.1318,
+"y": 36.1288
+},
+"created": "2020-03-23T17:41:01.937+0000"
+},
+"distance": {
+"value": 18.607502851423607,
+"metric": "KILOMETERS"
+}
+},
+{
+"content": {
+"id": "5e78f4ad855c334e774d69d8",
+"username": "30",
+"pingType": "LOC",
+"loc": {
+"x": 115.1318,
+"y": 36.1288
+},
+"created": "2020-03-23T17:41:01.935+0000"
+},
+"distance": {
+"value": 18.607502851423607,
+"metric": "KILOMETERS"
+}
+},
+{
+"content": {
+"id": "5e78f4ad855c334e774d69da",
+"username": "34",
+"pingType": "LOC",
+"loc": {
+"x": 115.1318,
+"y": 36.1288
+},
+"created": "2020-03-23T17:41:01.936+0000"
+},
+"distance": {
+"value": 18.607502851423607,
+"metric": "KILOMETERS"
+}
+},
+{
+"content": {
+"id": "5e78f4ad855c334e774d69d7",
+"username": "28",
+"pingType": "LOC",
+"loc": {
+"x": 115.1318,
+"y": 36.1288
+},
+"created": "2020-03-23T17:41:01.934+0000"
+},
+"distance": {
+"value": 18.607502851423607,
+"metric": "KILOMETERS"
+}
+},
+{
+"content": {
+"id": "5e78f4ad855c334e774d69d6",
+"username": "26",
+"pingType": "LOC",
+"loc": {
+"x": 115.1318,
+"y": 36.1288
+},
+"created": "2020-03-23T17:41:01.933+0000"
+},
+"distance": {
+"value": 18.607502851423607,
+"metric": "KILOMETERS"
+}
+},
+{
+"content": {
+"id": "5e78f4ad855c334e774d69d5",
+"username": "24",
+"pingType": "LOC",
+"loc": {
+"x": 115.1318,
+"y": 36.1288
+},
+"created": "2020-03-23T17:41:01.932+0000"
+},
+"distance": {
+"value": 18.607502851423607,
+"metric": "KILOMETERS"
+}
+},
+{
+"content": {
+"id": "5e78f4ad855c334e774d69d4",
+"username": "22",
+"pingType": "LOC",
+"loc": {
+"x": 115.1318,
+"y": 36.1288
+},
+"created": "2020-03-23T17:41:01.911+0000"
+},
+"distance": {
+"value": 18.607502851423607,
+"metric": "KILOMETERS"
+}
+},
+{
+"content": {
+"id": "5e785ccf26af8c31c83b0b94",
+"username": "38",
+"pingType": "LOC",
+"loc": {
+"x": 115.1318,
+"y": 36.1288
+},
+"created": "2020-03-23T06:53:03.094+0000"
+},
+"distance": {
+"value": 18.607502851423607,
+"metric": "KILOMETERS"
+}
+},
+{
+"content": {
+"id": "5e785ccf26af8c31c83b0b91",
+"username": "32",
+"pingType": "LOC",
+"loc": {
+"x": 115.1318,
+"y": 36.1288
+},
+"created": "2020-03-23T06:53:03.091+0000"
+},
+"distance": {
+"value": 18.607502851423607,
+"metric": "KILOMETERS"
+}
+},
+{
+"content": {
+"id": "5e785ccf26af8c31c83b0b93",
+"username": "36",
+"pingType": "LOC",
+"loc": {
+"x": 115.1318,
+"y": 36.1288
+},
+"created": "2020-03-23T06:53:03.093+0000"
+},
+"distance": {
+"value": 18.607502851423607,
+"metric": "KILOMETERS"
+}
+},
+{
+"content": {
+"id": "5e785ccf26af8c31c83b0b90",
+"username": "30",
+"pingType": "LOC",
+"loc": {
+"x": 115.1318,
+"y": 36.1288
+},
+"created": "2020-03-23T06:53:03.090+0000"
+},
+"distance": {
+"value": 18.607502851423607,
+"metric": "KILOMETERS"
+}
+},
+{
+"content": {
+"id": "5e785ccf26af8c31c83b0b8d",
+"username": "24",
+"pingType": "LOC",
+"loc": {
+"x": 115.1318,
+"y": 36.1288
+},
+"created": "2020-03-23T06:53:03.087+0000"
+},
+"distance": {
+"value": 18.607502851423607,
+"metric": "KILOMETERS"
+}
+},
+{
+"content": {
+"id": "5e785ccf26af8c31c83b0b8f",
+"username": "28",
+"pingType": "LOC",
+"loc": {
+"x": 115.1318,
+"y": 36.1288
+},
+"created": "2020-03-23T06:53:03.089+0000"
+},
+"distance": {
+"value": 18.607502851423607,
+"metric": "KILOMETERS"
+}
+}
+]
+},
+"numElements": 0,
+"page": 0,
+"numPages": 0
+}
