@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import com.idontchop.datesearchservice.api.MicroServiceApiAbstract;
 import com.idontchop.datesearchservice.config.enums.MicroService;
 
-@Component("LikeServieApi")
+@Component("LikeServiceApi")
 public class LikeServiceApi extends MicroServiceApiAbstract {
 
 	

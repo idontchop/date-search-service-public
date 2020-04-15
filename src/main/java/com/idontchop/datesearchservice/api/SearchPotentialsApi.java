@@ -87,6 +87,9 @@ public class SearchPotentialsApi implements ApplicationContextAware {
 		
 		spa.reduceApisServices( searchRequest.getReduceSearch() );
 		
+		// add matches here
+		spa.matchApisServices( searchRequest.getMatchesSearch() );
+		
 		// populate our ReduceRequest with relavent args from searchRequest
 		spa.reduceRequestFromSearchRequest(searchRequest);
 		
@@ -125,12 +128,7 @@ public class SearchPotentialsApi implements ApplicationContextAware {
 	 * @return
 	 */
 	public SearchPotentialsApi reduceApisServices ( List<MicroService> services ) {
-		this.reduceApiCalls = services.stream().map( e -> {
-			MicroServiceApiAbstract serviceApi = (MicroServiceApiAbstract)
-					context.getBean(e.getClassName());
-			// specific service code goes here
-			return serviceApi;
-		}).collect(Collectors.toList());
+		this.reduceApiCalls = addApisFromList (services);
 		
 		// Add always calls
 		this.reduceApiCalls.addAll(
@@ -140,6 +138,26 @@ public class SearchPotentialsApi implements ApplicationContextAware {
 			.collect(Collectors.toList()));
 		
 		return this;
+	}
+	
+	public SearchPotentialsApi matchApisServices ( List<MicroService> services ) {
+		this.matchApiCalls = addApisFromList (services);
+		return this;
+	}
+	
+	/**
+	 * Helper to matchApisServices and reduceApisServices
+	 * 
+	 * @param services
+	 * @return
+	 */
+	private List<MicroServiceApiAbstract> addApisFromList ( List<MicroService> services ) {
+		return services.stream().map( e -> {
+			MicroServiceApiAbstract serviceApi = (MicroServiceApiAbstract)
+					context.getBean(e.getClassName());
+			// specific service code goes here
+			return serviceApi;
+		}).collect(Collectors.toList());
 	}
 	
 	/**
@@ -183,8 +201,15 @@ public class SearchPotentialsApi implements ApplicationContextAware {
 	 */
 	private Mono<SearchDto> doReduceApiCalls ()  {
 		
+		List<Mono<SearchDto>> monoApiCalls = new ArrayList<>();
+		
+		monoApiCalls.addAll(matchApiCalls.stream()
+				.map( e -> e.addMatch(reduceRequest)).collect(Collectors.toList()));
+		monoApiCalls.addAll(reduceApiCalls.stream()
+				.map( e -> e.reduce(reduceRequest)).collect(Collectors.toList()));
+		
 		return Mono.zip (
-				reduceApiCalls.stream().map( e -> e.reduce(reduceRequest)).collect(Collectors.toList()),
+				monoApiCalls,
 				resultMonos -> {  // blocked for completion of all api calls
 					
 					for ( int i = 1; i < resultMonos.length; i++) {

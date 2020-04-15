@@ -53,6 +53,19 @@ public class SearchDto {
 		return newDto;
 	}
 	
+	public static SearchDto build ( Iterable<String> potentials ) {
+		SearchDto newDto = build();
+		potentials.forEach(newDto.getPotentials()::add);
+		return newDto;
+	}
+	
+	public static SearchDto build ( Set<String> potentials, Set<String> matches, String matchName ) {
+		SearchDto newDto = build();
+		newDto.setPotentials(potentials);
+		newDto.setNewMatch(matchName, matches);
+		return newDto;
+	}
+	
 	public static SearchDto empty ( String service, String level, String message ) {
 		SearchDto newDto = build();
 		ApiMessage apiM = new ApiMessage();
@@ -66,9 +79,20 @@ public class SearchDto {
 		newDto.add(service, ApiMessage.error(error).setMessage(message) );
 		return newDto;
 	}
-	
+		
+	/**
+	 * Adds an ApiMessage. If the name already exists, will be added with timestamp.
+	 * 
+	 * @param name the key
+	 * @param newApiMessage
+	 * @return
+	 */
 	public SearchDto add (String name, ApiMessage newApiMessage ) {
-		apiMessages.put(name, newApiMessage);
+		if ( apiMessages.containsKey(name)) {
+			apiMessages.put( name + "@" + LocalDateTime.now().toString(), newApiMessage);
+		} else {
+			apiMessages.put(name, newApiMessage);
+		}
 		return this;
 	}
 	
@@ -106,6 +130,10 @@ public class SearchDto {
 	
 	public Map<String, Set<String>> getMatches() {
 		return matches;
+	}
+	
+	public void setNewMatch ( String name, Set<String> matches ) {
+		this.matches.put(name, matches);
 	}
 
 	public void setMatches(Map<String, Set<String>> matches) {
@@ -154,6 +182,47 @@ public class SearchDto {
 		});
 		
 		return this;
+	}
+	
+	/**
+	 * Combines the dtos by absorbing all potentials from the parameter
+	 * into a new match entry.
+	 * 
+	 * Use primarily to add a search dto from a matches request.
+	 * 
+	 * @param searchDto
+	 * @return
+	 */
+	public SearchDto absorbMatch ( SearchDto searchDto, String name ) {
+		
+		created = LocalDateTime.now();
+		
+		// if already contains the key, list the error
+		if ( this.getMatches().containsKey(name)) {
+			this.add(name, ApiMessage.error( name + " match exists, writing with timestamp."));
+			this.getMatches().put(name + "@" + LocalDateTime.now(), searchDto.getPotentials());
+		} else {
+			this.getMatches().put(name, searchDto.getPotentials());
+		}
+		// catch error, create message, but add anyway
+		searchDto.getMatches().forEach( (k,v) -> {
+			if (this.matches.containsKey(k)) {
+				this.add(name, ApiMessage.error(k + " match exists. Writing as " + k + created.toString()));
+				this.matches.put(name, searchDto.getPotentials());
+			} else {
+				this.matches.put(name, searchDto.getPotentials());
+			}			
+		});
+		
+		// combine ApiMessages, duplicates should never happen
+		// and would likely indicate an error in itself
+		
+		searchDto.getApiMessages().forEach( (k,v) -> {
+			this.add(k,v);			
+		});
+		
+		return this;
+		
 	}
 
 }

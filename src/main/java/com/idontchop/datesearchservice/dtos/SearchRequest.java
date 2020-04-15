@@ -23,6 +23,8 @@ public class SearchRequest {
 	// Set by front end and added to by backend (blocks)
 	private List<MicroService> reduceSearch = new ArrayList<>();
 	
+	private List<MicroService> matchesSearch = new ArrayList<>();
+	
 	private double lat;
 	private double lng;
 	private int range;
@@ -122,6 +124,14 @@ public class SearchRequest {
 
 	public void setUsername(String username) {
 		this.username = username;
+	}
+
+	public List<MicroService> getMatchesSearch() {
+		return matchesSearch;
+	}
+
+	public void setMatchesSearch(List<MicroService> matchesSearch) {
+		this.matchesSearch = matchesSearch;
 	}
 	
 	

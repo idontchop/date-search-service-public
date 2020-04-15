@@ -1,13 +1,20 @@
 package com.idontchop.datesearchservice;
 
+import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -25,10 +32,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.idontchop.datesearchservice.api.JsonExtraction;
 import com.idontchop.datesearchservice.api.MicroServiceApiAbstract;
+import com.idontchop.datesearchservice.api.SearchPotentialsApi;
 import com.idontchop.datesearchservice.api.TestApis;
 import com.idontchop.datesearchservice.api.microservices.LocationServiceApi;
 import com.idontchop.datesearchservice.config.enums.MicroService;
+import com.idontchop.datesearchservice.dtos.ReduceRequest;
 import com.idontchop.datesearchservice.dtos.RestMessage;
+import com.idontchop.datesearchservice.dtos.SearchDto;
+import com.idontchop.datesearchservice.dtos.SearchRequest;
 
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -108,53 +119,170 @@ public class MicroServiceMocks {
 	}
 	
 	@Test
-	void testLocationSearch () throws JsonProcessingException, InterruptedException {
+	void testLocationSearch () throws InterruptedException, IOException {
 		
 		String testApiString = "test api";
 		
-		RestMessage restMessage = RestMessage.build("Test From test helloWorld");
-		RestMessage restMessage2 = RestMessage.build("Test From test helloWorld");
-		RestMessage badRestMessage = RestMessage.build("Not Good");
+		MockWebServer baseCall = micros.get(MicroService.LOCATION);
 		
-		assertTrue( restMessage.equals(restMessage2));
-		assertFalse( restMessage.equals(badRestMessage));
-		
-		mockServices.enqueue( new MockResponse()
-				.setBody("test api") );
-		
-		WebClient webClient = WebClient.create("http://localhost:62698/test-location/api/search-location/LOC,HOME/34.001/114.001/500");
-		Mono<String> test = webClient.get().retrieve().bodyToMono(String.class);
-		
-		assertEquals(62698, mockServices.getPort());
-		
-		
-		assertEquals(testApiString, test.block());
-		
-		RecordedRequest rr = mockServices.takeRequest();
-		assertEquals("GET", rr.getMethod());
-		assertEquals("/test-location/api/search-location/LOC,HOME/34.001/114.001/500", rr.getPath());
-		
-		mockServices.enqueue( new MockResponse()
-				.setBody(objectMapper.writeValueAsString(restMessage))
+		baseCall.enqueue( new MockResponse ()
+				.setBody(locJson())
 				.addHeader("Content-type", "application/json"));
 
-		Mono<RestMessage> rm = testApis.testDirectCall();
+		Mono<String> result = testApis.testLocationSearch();
 		
-		//assertEquals (restMessage, rm.block());
-		StepVerifier.create(rm)
-			.expectNext(restMessage)
-			.verifyComplete();
-	
+		Set<String> potentials = jsonExtraction.userListFromLocation(result.block());
+		logger.debug("---");
+		logger.debug( "testlocationSearch" + potentials.toString());
+		logger.debug("---");
 	}
 	
 	@Test
-	void testReduce() {
+	void testAddMatch () throws InterruptedException {
+		List<String> likeList = List.of("30", "22");
 		
-		MockWebServer baseCall = micros.get(MicroService.LOCATION);
+		// test searchdto absorb
+		SearchDto sdto = SearchDto.build(likeList);
+		SearchDto adto = SearchDto.build().absorbMatch(sdto, "like");
+		assertEquals(1, adto.getMatches().size());
 		
 		
+		try {
+			setMock(MicroService.LIKE, likeList);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		MicroServiceApiAbstract api = (MicroServiceApiAbstract) context.getBean(MicroService.LIKE.getClassName());
+		
+		ReduceRequest reduceRequest = new ReduceRequest();
+		reduceRequest.setName("username"); reduceRequest.setPotentials(List.of("none"));
+		SearchDto dto = api.addMatch(reduceRequest).block();
+		
+		RecordedRequest rr = micros.get(MicroService.LIKE).takeRequest();
+		
+		assertEquals("POST", rr.getMethod());
+		assertNotNull(dto);
+		assertEquals(1, dto.getPotentials().size());
+		assertEquals(0, dto.getApiMessages().size());
+		assertEquals(1, dto.getMatches().size());
+		assertEquals(likeList.stream().collect(Collectors.toSet()), dto.getMatches().get(MicroService.LIKE.getName()));
+		assertEquals(Set.of("none"), dto.getPotentials());
 		
 	}
+	
+	@Test
+	void testReduce()  {
+		
+		
+		
+		// location: base call
+		MockWebServer baseCall = micros.get(MicroService.LOCATION);
+		baseCall.enqueue( new MockResponse ()
+				.setBody(locJson())
+				.addHeader("Content-type", "application/json"));
+		
+		// reduce calls
+		try {
+			setMock(MicroService.BLOCK, List.of("30"));
+			setMock(MicroService.AGE, List.of("30", "22", "20"));
+			setMock(MicroService.LIKE, List.of("30"));
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+		
+		SearchRequest searchRequest = getSearchRequest();
+		// Search Potentials
+		SearchPotentialsApi sApi = SearchPotentialsApi.from(searchRequest, context);
+		
+		
+		// Run reduce and produce SearchDto
+		Mono<SearchDto> m = sApi.run();
+		SearchDto sdto = null;
+		try {
+			sdto = m.block();
+		} catch ( Exception e ) {
+
+			assertNull(e.getMessage());
+		}
+		
+
+		// Check requests
+		RecordedRequest request = null, likeRequest = null;
+		RecordedRequest ageRequest = null;
+		try {
+			ageRequest = micros.get(MicroService.AGE).takeRequest();
+			request = micros.get(MicroService.BLOCK).takeRequest();
+			likeRequest = micros.get(MicroService.LIKE).takeRequest();
+		} catch (Exception e) {
+
+			assertNull(e.getMessage());
+		}
+		
+		assertEquals("POST", ageRequest.getMethod());
+		assertEquals("POST",request.getMethod());
+		assertEquals("POST", likeRequest.getMethod());
+		
+
+		assertEquals(1,sdto.getMatches().size());
+		assertTrue(sdto.getMatches().containsKey(MicroService.LIKE.getName()));
+		assertEquals(1, sdto.getMatches().get(MicroService.LIKE.getName()).size());
+		assertTrue(sdto.getMatches().get(MicroService.LIKE.getName()).contains("30"));
+		assertEquals(1,sdto.getPotentials().size());
+		assertTrue(sdto.getPotentials().contains("30"));
+				
+
+	}
+	
+	private void setMock (MicroService m, List<String> users) throws JsonProcessingException {
+		
+		MockWebServer mws = micros.get(m);
+		mws.enqueue( new MockResponse()
+				.setBody(objectMapper.writeValueAsString(users))
+				.addHeader("Content-type", "application/json") );
+	}
+	
+	private static String locJson () {
+		
+		byte[] encoded;
+		try {
+			encoded = Files.readAllBytes(Paths.get("./src/test/java/com/idontchop/datesearchservice/location-result.json"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			encoded = null;
+		}
+		return new String ( encoded, StandardCharsets.US_ASCII);
+	}
+	
+	private static SearchRequest getSearchRequest () {
+		
+		SearchRequest searchRequest = new SearchRequest();
+		List<MicroService> reduceSearches =
+				List.of(MicroService.AGE);
+		List<MicroService> matchSearches =
+				List.of(MicroService.LIKE);
+		
+		int maxAge = 80, minAge = 5, range = 500;
+		double lat = 34.001, lng = 114.001;
+		String locationTypes = "LOC,HOME";
+		String username  = "username";
+		
+		searchRequest.setUsername(username);
+		searchRequest.setBaseSearch(MicroService.LOCATION);
+		searchRequest.setReduceSearch(reduceSearches);
+		searchRequest.setMatchesSearch(matchSearches);
+		searchRequest.setLocationTypes(locationTypes);
+		searchRequest.setMaxAge(maxAge);
+		searchRequest.setMinAge(minAge);
+		searchRequest.setLat(lat); searchRequest.setLng(lng);
+		searchRequest.setRange(range);
+		searchRequest.setSelections(List.of());
+		
+		return searchRequest;
+	}
+	
 	
 
 

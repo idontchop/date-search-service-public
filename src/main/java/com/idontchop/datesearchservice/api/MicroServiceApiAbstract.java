@@ -41,8 +41,8 @@ public abstract class MicroServiceApiAbstract {
 	
 	protected MicroService microService;	// set in constructor of subclass
 	
-	protected String apiReduceExt = 	"/api/reduce"; 	// can be overridden by subclass if necessary
-													// but should try to standardize this
+	protected String apiMatchExt =		"/api/match";	// can be overridden by subclass if necessary
+	protected String apiReduceExt = 	"/api/reduce"; 	// but should try to standardize this													
 	
 	protected String apiBaseExt  =		"/api/baseSearch";	// The api call to get a fresh list
 	
@@ -54,9 +54,7 @@ public abstract class MicroServiceApiAbstract {
 	
 	@Value("${spring.profiles.active}")
 	private String activeProfile;
-	
-	
-	
+
 	@Autowired
 	private WebClient.Builder webClientBuilder;
 	
@@ -151,8 +149,7 @@ public abstract class MicroServiceApiAbstract {
 		// Use enum to find the proper microservice from Eureka
 		WebClient webClient;
 		try {
-			webClient = webClientBuilder
-				.baseUrl("http://" + getServiceAddress()).build();
+			webClient = getWebClient();
 		} catch (RuntimeException ex ) {
 			// reason: Service not registered
 			return handleResponseError(ex);
@@ -165,6 +162,41 @@ public abstract class MicroServiceApiAbstract {
 				.flatMap( response -> convertResponseBody(response) )
 				.doOnError( ex -> logger.debug(ex.getMessage()))
 				.onErrorResume( ex -> handleResponseError(ex) );
+	}
+	
+	/**
+	 * Calls a microservice and sets matches in a reduce request. This call
+	 * doesn't manipulate the list of potentials, and instead creates a new entry
+	 * in the SearchDto's matches.
+	 * 
+	 * @param reduceRequest
+	 * @return
+	 */
+	public Mono<SearchDto> addMatch ( ReduceRequest reduceRequest ) {
+		
+		// Use enum to find the proper microservice from Eureka
+		WebClient webClient;
+		try {
+			webClient = getWebClient();
+		} catch (RuntimeException ex ) {
+			// reason: Service not registered
+			return handleResponseError(ex);
+		}
+		
+		// API call will return a new SearchDto which will be mapped back to searchdto with
+		// full potentials
+		return webClient.post().uri( uriBuilder -> uriBuilder.path(apiMatchExt).build(0) )
+				.bodyValue(reduceRequest)
+				.exchange()
+				.flatMap( response -> convertResponseBody(response) )
+				.flatMap( searchDto -> {		// here we convert this dto so it can be easily zipped with other reduces
+					SearchDto newDto = SearchDto.build(reduceRequest.getPotentials());	// build with original potentails
+					newDto.absorbMatch(searchDto, microService.getName());				// absorb the match
+					return Mono.just(newDto);		
+				})
+				.doOnError( ex -> logger.debug(ex.getMessage()))
+				.onErrorResume( ex -> handleResponseError(ex) );
+				
 	}
 	
 	/**
