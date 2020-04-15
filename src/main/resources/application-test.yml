@@ -1,0 +1,8 @@
+date:
+  test: active
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    registerWithEureka: false
+    fetchRegistry: false

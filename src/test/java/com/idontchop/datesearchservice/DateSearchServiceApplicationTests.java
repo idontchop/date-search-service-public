@@ -1,6 +1,7 @@
 package com.idontchop.datesearchservice;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
@@ -13,8 +14,12 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Profile;
+import org.springframework.core.env.Environment;
+import org.springframework.test.context.ActiveProfiles;
 
 import com.idontchop.datesearchservice.api.JsonExtraction;
 import com.idontchop.datesearchservice.api.MicroServiceApiAbstract;
@@ -31,6 +36,7 @@ import com.idontchop.datesearchservice.dtos.SearchRequest;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+@ActiveProfiles("test")
 @SpringBootTest
 class DateSearchServiceApplicationTests {
 	
@@ -45,18 +51,31 @@ class DateSearchServiceApplicationTests {
 	@Autowired
 	private JsonExtraction jsonExtraction;
 	
-	@Test
-	void contextLoads() {
-	}
+	@Value ("${spring.profiles.active")
+	private String activeProfile;
+	
+	@Autowired
+	private Environment env;
 	
 	@Test
+	void contextLoads() {
+		assertEquals("test", env.getProperty("spring.profiles.active"));
+		MicroServiceApiAbstract mapi = (MicroServiceApiAbstract) context.getBean("AgeServiceApi");
+		assertEquals("localhost:62902/test-age", mapi.getServiceAddress());
+		assertEquals("test", env.getProperty("spring.profiles.active"));
+		assertEquals("active", env.getProperty("date.test"));
+		assertNotNull(env.getProperty("eureka.instance.hostname")); 
+		assertNotNull(env.getProperty("eureka.client.registerWithEureka"));
+	}
+	
+	//@Test
 	public void testDirectCall () {
 		RestMessage test = testApis.testDirectCall().block();
 		
 		assertTrue ( test.getMessages().get("message") != null);
 	}
 	
-	@Test
+	//@Test
 	public void testSearchPotentials () {
 		SearchRequest searchRequest = new SearchRequest();
 		List<MicroService> reduceSearches =
@@ -100,7 +119,7 @@ class DateSearchServiceApplicationTests {
 		
 	}
 	
-	@Test
+	//@Test
 	public void testMono () {
 		
 		// ok, get two lists to intersect
@@ -132,7 +151,7 @@ class DateSearchServiceApplicationTests {
 		
 	}
 	
-	@Test
+	//@Test
 	public void testAbstractApis () throws IOException {
 		
 		String username = "username";
@@ -178,7 +197,7 @@ class DateSearchServiceApplicationTests {
 		
 	}
 	
-	@Test
+	//@Test
 	public void testZip () throws IOException {
 		
 		String username = "username";
@@ -237,7 +256,7 @@ class DateSearchServiceApplicationTests {
 		 */
 	}
 	
-	@Test
+	//@Test
 	public void testHelloWorlds() throws InterruptedException {
 		
 		Flux<SearchDto> apis = testApis.helloWorlds();

@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -132,11 +133,41 @@ public class TestApis {
 	
 	public Mono<RestMessage> testDirectCall () {
 		
-		String testurl = "http://MEDIA-SERVICE/helloWorld";
+		String testurl = "http://localhost:62698/helloWorld";
 		
-		WebClient webClient = webClientBuilder.build();
+		WebClient webClient = WebClient.builder().build();
 		
 		return webClient.get().uri(testurl).retrieve().bodyToMono(RestMessage.class);
+	}
+	
+	public Mono<String> testCall () {
+		
+		WebClient.Builder webClientBuilder = WebClient.builder();
+		WebClient webClient;
+		try {
+			webClient = webClientBuilder
+				.baseUrl("http://" + MicroService.LOCATION.getTestAddress()).build();
+		} catch ( RuntimeException ex ) {
+			return Mono.error(ex);
+		}
+		
+		String finalUrlExt = "LOC";
+		
+		return webClient.get()
+				.uri( uriBuilder -> uriBuilder.path(finalUrlExt).build(0) )
+				.retrieve().bodyToMono(String.class);
+	}
+	
+	public Mono<String> testOk() {
+		
+		LocationServiceApi locationApi;
+
+		locationApi = (LocationServiceApi) context
+				.getBean(MicroService.LOCATION.getClassName());
+
+	
+	return locationApi.baseSearch("loc");
+	
 	}
 	
 	public Mono<List<String>> reduceGender (String username, List<String> userList) {

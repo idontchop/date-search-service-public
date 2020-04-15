@@ -5,6 +5,8 @@ date:
   data:
     url: /data
 spring:
+  profiles:
+    active: prod
   application:
     name: search-service
 server:
@@ -13,7 +15,7 @@ eureka:
   instance:
     hostname: localhost
     metadataMap:
-      zone: zone1
+      zone: zone1      
 logging:
   level:
     org:

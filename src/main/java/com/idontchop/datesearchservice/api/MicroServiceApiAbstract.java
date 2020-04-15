@@ -7,6 +7,8 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.config.environment.Environment;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -50,6 +52,11 @@ public abstract class MicroServiceApiAbstract {
 		this.discoveryClient = discoveryClient;
 	}
 	
+	@Value("${spring.profiles.active}")
+	private String activeProfile;
+	
+	
+	
 	@Autowired
 	private WebClient.Builder webClientBuilder;
 	
@@ -68,9 +75,48 @@ public abstract class MicroServiceApiAbstract {
 	 * 
 	 * @return
 	 */
-	private InstanceInfo getServiceInfo () throws RuntimeException {
+	private InstanceInfo getServiceInstanceInfo () throws RuntimeException {
 		return discoveryClient
 			.getNextServerFromEureka(microService.getName(), false);
+	}
+	
+	/**
+	 * Provides a switch on tope of InstanceInfo to return a test url in the case of:
+	 * 
+	 * 1) Eureka Client is down
+	 * 2) Active Profile = test
+	 * 
+	 * @return
+	 * @throws RunTimeException
+	 */
+	public String getServiceAddress () throws RuntimeException {
+		
+		try {
+			return getServiceInstanceInfo().getAppName();
+		} catch ( RuntimeException ex ) {
+			if ( activeProfile.equals("test") ) {
+				return microService.getTestAddress();
+			} else throw new RuntimeException( ex.getMessage() + " " + activeProfile);
+		}
+	}
+	
+	/**
+	 * Returns proper web client. Mainly returns load balanced in production.
+	 * 
+	 * Regular webclient when in test.
+	 * 
+	 * @param url
+	 * @return
+	 * @throws RuntimeException
+	 */
+	private WebClient getWebClient (  ) throws RuntimeException {
+		
+		if ( activeProfile.equals("test") ) {
+			return WebClient.builder().baseUrl("http://" + getServiceAddress()).build();
+		} else {
+			// production web client
+			return webClientBuilder.baseUrl("http://" + getServiceAddress()).build();
+		}
 	}
 	
 	/**
@@ -106,7 +152,7 @@ public abstract class MicroServiceApiAbstract {
 		WebClient webClient;
 		try {
 			webClient = webClientBuilder
-				.baseUrl("http://" + getServiceInfo().getAppName()).build();
+				.baseUrl("http://" + getServiceAddress()).build();
 		} catch (RuntimeException ex ) {
 			// reason: Service not registered
 			return handleResponseError(ex);
@@ -188,17 +234,19 @@ public abstract class MicroServiceApiAbstract {
 		// Use enum to find the proper microservice from Eureka
 		WebClient webClient;
 		try {
-			webClient = webClientBuilder
-				.baseUrl("http://" + getServiceInfo().getAppName()).build();
+			
+			// call - error if eureka issue
+			webClient = getWebClient();
+			
+			// API call will return a Mono with a new List of potentials
+			return webClient.get().uri( uriBuilder -> uriBuilder.path(finalUrlExt).build(0) )
+					.retrieve()
+					.bodyToMono(String.class);
+			
 		} catch ( RuntimeException ex ) {
 			return Mono.error(ex);
-		}
-		
-		// API call will return a Mono with a new List of potentials
-		return webClient.get().uri( uriBuilder -> uriBuilder.path(finalUrlExt).build(0) )
-				.retrieve()
-				.bodyToMono(String.class);
-		
+		}		
 	}
+
 	
 }
