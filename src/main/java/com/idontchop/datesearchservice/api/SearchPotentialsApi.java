@@ -2,6 +2,8 @@ package com.idontchop.datesearchservice.api;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -203,9 +205,9 @@ public class SearchPotentialsApi implements ApplicationContextAware {
 		
 		List<Mono<SearchDto>> monoApiCalls = new ArrayList<>();
 		
-		monoApiCalls.addAll(matchApiCalls.stream()
+		monoApiCalls.addAll(matchApiCalls.stream() 		// match calls
 				.map( e -> e.addMatch(reduceRequest)).collect(Collectors.toList()));
-		monoApiCalls.addAll(reduceApiCalls.stream()
+		monoApiCalls.addAll(reduceApiCalls.stream()		// reduce calls
 				.map( e -> e.reduce(reduceRequest)).collect(Collectors.toList()));
 		
 		return Mono.zip (
