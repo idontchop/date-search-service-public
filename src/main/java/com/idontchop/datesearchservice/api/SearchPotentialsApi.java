@@ -59,7 +59,6 @@ public class SearchPotentialsApi implements ApplicationContextAware {
 	private List<MicroServiceApiAbstract> reduceApiCalls = new ArrayList<>();
 	private FullReduceRequest reduceRequest;	// built with args before potentials are added.
 	
-	
 	// Sets the matchs list in SearchDto
 	private List<MicroServiceApiAbstract> matchApiCalls = new ArrayList<>();
 	
@@ -166,7 +165,7 @@ public class SearchPotentialsApi implements ApplicationContextAware {
 		
 		return doBaseApiCall()
 				.flatMap ( potentials -> {
-					logger.debug("potentials" + potentials.toString());
+					
 					reduceRequest.setPotentials(potentials);					
 					return doReduceApiCalls();
 				})
@@ -184,12 +183,10 @@ public class SearchPotentialsApi implements ApplicationContextAware {
 	 */
 	private Mono<SearchDto> doReduceApiCalls ()  {
 		
-		
-		logger.debug("doReduceApiCalls" + reduceRequest.getPotentials().toString() );
 		return Mono.zip (
 				reduceApiCalls.stream().map( e -> e.reduce(reduceRequest)).collect(Collectors.toList()),
 				resultMonos -> {  // blocked for completion of all api calls
-					logger.debug("mono size" + resultMonos.length);
+					
 					for ( int i = 1; i < resultMonos.length; i++) {
 						// Combines all SearchDtos based on intersect method.
 						// intersect requires potentials to exist after every api call

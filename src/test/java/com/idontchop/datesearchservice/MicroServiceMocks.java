@@ -23,6 +23,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.idontchop.datesearchservice.api.JsonExtraction;
 import com.idontchop.datesearchservice.api.MicroServiceApiAbstract;
 import com.idontchop.datesearchservice.api.TestApis;
 import com.idontchop.datesearchservice.api.microservices.LocationServiceApi;
@@ -52,6 +53,9 @@ public class MicroServiceMocks {
 	
 	@Autowired
 	private ApplicationContext context;
+	
+	@Autowired
+	JsonExtraction jsonExtraction;
 	
 	public static MockWebServer mockServices;
 	
@@ -148,7 +152,8 @@ public class MicroServiceMocks {
 		
 		MockWebServer baseCall = micros.get(MicroService.LOCATION);
 		
-		// set 
+		
+		
 	}
 	
 
