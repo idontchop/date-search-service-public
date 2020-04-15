@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -173,7 +174,7 @@ public class MicroServiceMocks {
 	}
 	
 	@Test
-	void testReduce()  {
+	void testReduce() throws IOException  {
 		
 		
 		
@@ -183,11 +184,17 @@ public class MicroServiceMocks {
 				.setBody(locJson())
 				.addHeader("Content-type", "application/json"));
 		
+		assertEquals ( 9, jsonExtraction.userListFromLocation(locJson()).size());
+		List<String> baseList = new ArrayList<>(jsonExtraction.userListFromLocation(locJson()));
+		logger.debug("Base List: " + baseList.toString());
+		List<String> hideList = List.of("22", "34", "24", "36");
+		
 		// reduce calls
 		try {
-			setMock(MicroService.BLOCK, List.of("30"));
-			setMock(MicroService.AGE, List.of("30", "22", "20"));
-			setMock(MicroService.LIKE, List.of("30"));
+			setMock(MicroService.BLOCK, baseList);
+			setMock(MicroService.AGE, baseList);
+			setMock(MicroService.LIKE, baseList);
+			setMock(MicroService.HIDE, hideList);
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		}
@@ -207,7 +214,7 @@ public class MicroServiceMocks {
 			assertNull(e.getMessage());
 		}
 		
-
+		
 		// Check requests
 		RecordedRequest request = null, likeRequest = null;
 		RecordedRequest ageRequest = null;
@@ -225,12 +232,17 @@ public class MicroServiceMocks {
 		assertEquals("POST", likeRequest.getMethod());
 		
 
+		// TODO: wrap parts of this test in function with configurable tests
+		// Matches
 		assertEquals(1,sdto.getMatches().size());
 		assertTrue(sdto.getMatches().containsKey(MicroService.LIKE.getName()));
-		assertEquals(1, sdto.getMatches().get(MicroService.LIKE.getName()).size());
-		assertTrue(sdto.getMatches().get(MicroService.LIKE.getName()).contains("30"));
-		assertEquals(1,sdto.getPotentials().size());
-		assertTrue(sdto.getPotentials().contains("30"));
+		//assertEquals(1, sdto.getMatches().get(MicroService.LIKE.getName()).size());
+		//assertTrue(sdto.getMatches().get(MicroService.LIKE.getName()).contains("30"));
+		
+		
+		// potentials
+		assertEquals(hideList.size(),sdto.getPotentials().size());
+		assertTrue(sdto.getPotentials().contains("22") && sdto.getPotentials().contains("24"));
 				
 
 	}
@@ -260,7 +272,7 @@ public class MicroServiceMocks {
 		
 		SearchRequest searchRequest = new SearchRequest();
 		List<MicroService> reduceSearches =
-				List.of(MicroService.AGE);
+				List.of(MicroService.AGE, MicroService.HIDE );
 		List<MicroService> matchSearches =
 				List.of(MicroService.LIKE);
 		
