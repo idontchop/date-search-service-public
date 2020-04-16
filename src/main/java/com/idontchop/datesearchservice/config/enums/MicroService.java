@@ -12,7 +12,8 @@ public enum MicroService {
 	AGE ("age-service", "AgeServiceApi", "localhost:62906/test-age"),
 	BLOCK ("block-service", "BlockServiceApi", "localhost:62907/test-block"),
 	HIDE ("hide-service", "HideServiceApi", "localhost:62908/test-hide"),
-	LIKE ("like-service", "LikeServiceApi", "localhost:62909/test-like");
+	LIKE ("like-service", "LikeServiceApi", "localhost:62909/test-like"),
+	CONNECTION ("connection-service", "ConnectionServiceApi", "localhost:62910/test-connection");
 	
 	private String name;
 	
