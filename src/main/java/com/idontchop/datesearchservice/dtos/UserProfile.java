@@ -1,5 +1,11 @@
 package com.idontchop.datesearchservice.dtos;
 
+/**
+ * Used for updating User Profile. Information taken from this form will be propagated to various microservices.
+ * 
+ * @author micro
+ *
+ */
 public class UserProfile {
 
 	private String username;
