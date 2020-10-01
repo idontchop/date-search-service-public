@@ -3,10 +3,10 @@ Reactive Search Service for Dating App
 
 * As of April 15, 2020, additional development on this project will go into a private repository. Though still at low-fidelity,
 the basic structure can be easily inferred and a working app is very close.
-see: https://github.com/idontchop/date-search-service/blob/master/src/main/java/com/idontchop/datesearchservice/api/SearchPotentialsApi.java
+see: https://github.com/idontchop/date-search-service-public/blob/master/src/main/java/com/idontchop/datesearchservice/api/SearchPotentialsApi.java
 
 # Micro Service Architecture
-![Dating App Microservice Architecture](https://github.com/idontchop/date-search-service/blob/master/src/main/resources/architecture%20uml-01.jpg)
+![Dating App Microservice Architecture](https://github.com/idontchop/date-search-service-public/blob/master/src/main/resources/architecture%20uml-01.jpg)
 
 # Dating App Microservice Architecture
 This project is part-learning project, part-job application, part-maybe future business endeavor. In the design, I wanted to accommodate the following business requirements from the ground up.
@@ -29,7 +29,7 @@ For example, a search in a certain location, age group, and non-smoker/non-drink
 
 See the following for work completed for this demonstration:
 
-https://github.com/idontchop/date-search-service/blob/master/src/main/java/com/idontchop/datesearchservice/api/SearchPotentialsApi.java
+https://github.com/idontchop/date-search-service-public/blob/master/src/main/java/com/idontchop/datesearchservice/api/SearchPotentialsApi.java
 
 # Modern Pay Structure
 
